@@ -484,17 +484,15 @@ function renderActive() {
     el('div', { class: 'progress' }, el('div', { style: `width:${(App.progress.visited.length / wps.length * 100).toFixed(0)}%` }))
   ));
 
-  let distText = '—', bearingText = '—', accText = '';
+  let distText = '—', accText = '';
   if (App.position && wp.coordinates) {
-    const d = haversine(App.position, wp.coordinates);
-    distText = fmtDist(d);
-    const b = bearing(App.position, wp.coordinates);
-    bearingText = compassText(b);
+    distText = fmtDist(haversine(App.position, wp.coordinates));
     if (App.positionAccuracy) accText = `±${Math.round(App.positionAccuracy)} m GPS`;
   }
-  root.appendChild(el('div', { class: 'live' },
-    el('div', { class: 'card' }, el('div', { class: 'dim' }, 'Avstånd'), el('div', { class: 'big' }, distText), el('small', {}, accText)),
-    el('div', { class: 'card' }, el('div', { class: 'dim' }, 'Riktning'), el('div', { class: 'big' }, bearingText))
+  root.appendChild(el('div', { class: 'card', style: 'text-align:center;' },
+    el('div', { class: 'dim' }, 'Avstånd till nästa stopp'),
+    el('div', { class: 'big', id: 'live-distance' }, distText),
+    el('small', { id: 'live-accuracy' }, accText)
   ));
 
   root.appendChild(el('div', { id: 'active-map' }));
@@ -538,15 +536,30 @@ function initActiveMap() {
   updateUserMarker();
 }
 
+function updateLiveDistance() {
+  const wp = App.tour.waypoints[App.activeWaypointIdx];
+  if (!wp || !App.position) return;
+  const dEl = document.getElementById('live-distance');
+  const aEl = document.getElementById('live-accuracy');
+  if (dEl) dEl.textContent = fmtDist(haversine(App.position, wp.coordinates));
+  if (aEl && App.positionAccuracy) aEl.textContent = `±${Math.round(App.positionAccuracy)} m GPS`;
+}
+
 function updateUserMarker() {
   if (!activeMap || !App.position) return;
   if (!userMarker) {
     const icon = L.divIcon({ className: '', html: `<div style="width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid white;box-shadow:0 0 0 2px #2563eb;"></div>`, iconSize: [18,18], iconAnchor: [9,9] });
     userMarker = L.marker(App.position, { icon }).addTo(activeMap);
   } else userMarker.setLatLng(App.position);
-  if (userAccCircle) userAccCircle.remove();
+  // Update existing accuracy circle in place rather than removing and
+  // re-adding (which caused a visible flicker each GPS tick).
   if (App.positionAccuracy) {
-    userAccCircle = L.circle(App.position, { radius: App.positionAccuracy, color: '#2563eb', fillOpacity: 0.08, weight: 1 }).addTo(activeMap);
+    if (!userAccCircle) {
+      userAccCircle = L.circle(App.position, { radius: App.positionAccuracy, color: '#2563eb', fillOpacity: 0.08, weight: 1 }).addTo(activeMap);
+    } else {
+      userAccCircle.setLatLng(App.position);
+      userAccCircle.setRadius(App.positionAccuracy);
+    }
   }
 }
 
@@ -565,9 +578,7 @@ function startGeolocation() {
       checkTrigger();
       if (App.view === 'active') {
         updateUserMarker();
-        // Light-touch update of distance/bearing
-        const wp = App.tour.waypoints[App.activeWaypointIdx];
-        if (wp) render();
+        updateLiveDistance();
       }
     },
     err => {
