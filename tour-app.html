@@ -674,15 +674,21 @@ async function showWaypointModal(idx, isArrival) {
       el('ul', {}, wp.trivia.map(t => el('li', {}, t)))
     ) : null,
     wp.accessibility_notes ? el('div', { class: 'banner warn' }, '♿ ' + wp.accessibility_notes) : null,
-    wp.walk_to_next && idx < App.tour.waypoints.length - 1 ? el('div', { class: 'card' },
-      el('strong', {}, 'Till nästa stopp'),
-      el('div', {}, `${fmtDist(wp.walk_to_next.distance_m)} · ~${wp.walk_to_next.estimated_minutes} min`),
-      wp.walk_to_next.directions_hint ? el('div', { class: 'dim' }, wp.walk_to_next.directions_hint) : null
-    ) : null,
+    idx < App.tour.waypoints.length - 1 ? (() => {
+      const next = App.tour.waypoints[idx + 1];
+      return el('div', { class: 'card' },
+        el('strong', {}, `Till nästa stopp: ${next.title}`),
+        wp.walk_to_next ? el('div', {}, `${fmtDist(wp.walk_to_next.distance_m)} · ~${wp.walk_to_next.estimated_minutes} min`) : null,
+        wp.walk_to_next?.directions_hint ? el('div', { class: 'dim' }, wp.walk_to_next.directions_hint) : null,
+        el('div', { class: 'btn-row', style: 'margin-top: 10px;' },
+          el('button', { class: 'btn secondary', onclick: () => openInMaps(next.coordinates) }, `🗺 Navigera till ${next.title}`)
+        )
+      );
+    })() : null,
     linksDiv,
     el('div', { class: 'btn-row' },
       el('button', { class: 'btn secondary', id: 'tts-btn', onclick: () => onTTSClick(wp.narrative, t.language) }, '🔊 Läs upp'),
-      el('button', { class: 'btn secondary', onclick: () => openInMaps(wp.coordinates) }, 'Maps')
+      el('button', { class: 'btn secondary', onclick: () => openInMaps(wp.coordinates) }, `🗺 Hitta hit (${wp.title})`)
     ),
     el('label', {}, 'Anteckning'),
     el('textarea', { oninput: e => { App.progress.notes = App.progress.notes || {}; App.progress.notes[wp.id] = e.target.value; saveProgress(App.tour.tour.id, App.progress); } }, noteVal),
