@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+<title>Stadstur</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-elev: #f5f5f7;
+    --text: #0f172a;
+    --text-dim: #475569;
+    --border: #e2e8f0;
+    --accent: #2563eb;
+    --visited: #16a34a;
+    --warn: #eab308;
+    --danger: #dc2626;
+    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f172a;
+      --bg-elev: #1e293b;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --border: #334155;
+      --shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.5; -webkit-tap-highlight-color: transparent; }
+  body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  a { color: var(--accent); }
+  h1, h2, h3 { line-height: 1.25; margin: 0 0 0.5em; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.05rem; }
+  small, .dim { color: var(--text-dim); font-size: 0.9rem; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 50; }
+  .topbar h1 { font-size: 1.1rem; margin: 0; }
+  .topbar .actions { display: flex; gap: 8px; }
+  .icon-btn { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.85rem; }
+
+  .view { flex: 1; padding: 16px; max-width: 760px; width: 100%; margin: 0 auto; }
+  .hidden { display: none !important; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--accent); color: white; border: none; border-radius: 12px; padding: 14px 18px; font-weight: 600; font-size: 1rem; min-height: 48px; }
+  .btn.secondary { background: var(--bg-elev); color: var(--text); border: 1px solid var(--border); }
+  .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn.danger { background: var(--danger); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .btn-row .btn { flex: 1; min-width: 140px; }
+
+  .drop {
+    border: 2px dashed var(--border); border-radius: 16px; padding: 32px 20px; text-align: center; background: var(--bg-elev); cursor: pointer; transition: all 0.15s;
+  }
+  .drop.over { border-color: var(--accent); background: rgba(37,99,235,0.08); }
+  .drop input[type=file] { display: none; }
+
+  .card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin: 10px 0; box-shadow: var(--shadow); }
+  .card.clickable { cursor: pointer; }
+  .card.clickable:active { transform: scale(0.99); }
+
+  .tour-list .card { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .tour-list .meta { flex: 1; min-width: 0; }
+  .tour-list .meta strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  #map { width: 100%; height: 360px; border-radius: 12px; margin: 12px 0; }
+  #active-map { width: 100%; height: 280px; border-radius: 12px; }
+
+  .wp-row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .wp-row:last-child { border-bottom: none; }
+  .wp-num { flex: 0 0 32px; height: 32px; border-radius: 16px; background: var(--bg-elev); display: flex; align-items: center; justify-content: center; font-weight: 600; border: 1px solid var(--border); }
+  .wp-row.visited .wp-num { background: var(--visited); color: white; border-color: var(--visited); }
+  .wp-row.active .wp-num { background: var(--accent); color: white; border-color: var(--accent); }
+  .wp-row.optional .wp-num { background: var(--warn); color: white; }
+  .wp-body { flex: 1; min-width: 0; }
+  .wp-body strong { display: block; }
+
+  .progress { height: 6px; background: var(--bg-elev); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+  .progress > div { height: 100%; background: var(--accent); transition: width 0.3s; }
+
+  .live { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .live .card { margin: 0; text-align: center; }
+  .live .big { font-size: 1.8rem; font-weight: 700; }
+  .compass { font-size: 2rem; display: inline-block; transform-origin: center; transition: transform 0.3s; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
+  .modal { background: var(--bg); width: 100%; max-width: 760px; max-height: 92vh; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 20px; box-shadow: var(--shadow); }
+  @media (min-width: 600px) {
+    .modal-backdrop { align-items: center; }
+    .modal { border-radius: 20px; max-height: 80vh; }
+  }
+  .modal .modal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .modal .close { background: transparent; border: none; font-size: 1.5rem; padding: 4px 8px; line-height: 1; }
+
+  .wp-images { display: flex; gap: 8px; overflow-x: auto; margin: 8px 0 12px; padding-bottom: 4px; }
+  .wp-images img { height: 160px; width: auto; border-radius: 8px; flex-shrink: 0; object-fit: cover; }
+  .wp-images .img-search { display: inline-flex; align-items: center; padding: 0 12px; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--text); height: 160px; }
+
+  .narrative { white-space: pre-wrap; line-height: 1.6; }
+  .trivia { background: var(--bg-elev); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+  .trivia ul { margin: 4px 0; padding-left: 20px; }
+  .links a { display: inline-block; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin: 4px 4px 0 0; text-decoration: none; }
+  .links a.broken { opacity: 0.5; }
+
+  .banner { padding: 10px 14px; border-radius: 8px; margin: 10px 0; }
+  .banner.warn { background: rgba(234,179,8,0.15); border: 1px solid var(--warn); }
+  .banner.err { background: rgba(220,38,38,0.12); border: 1px solid var(--danger); color: var(--danger); }
+  .banner.info { background: rgba(37,99,235,0.10); border: 1px solid var(--accent); }
+
+  input[type=text], input[type=password], input[type=number], select, textarea {
+    width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font: inherit; min-height: 44px;
+  }
+  textarea { min-height: 80px; resize: vertical; }
+  label { display: block; margin: 12px 0 4px; font-weight: 500; }
+
+  .leaflet-div-icon { background: transparent; border: none; }
+  .wp-pin { width: 30px; height: 30px; border-radius: 50%; background: var(--text-dim); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-size: 0.85rem; }
+  .wp-pin.visited { background: var(--visited); }
+  .wp-pin.active { background: var(--accent); animation: pulse 1.5s ease-in-out infinite; }
+  .wp-pin.optional { background: var(--warn); }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+  .nav-bottom { position: sticky; bottom: 0; background: var(--bg); border-top: 1px solid var(--border); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); display: flex; gap: 8px; z-index: 30; }
+  .nav-bottom .btn { flex: 1; }
+
+  .footer-attr { font-size: 0.75rem; color: var(--text-dim); padding: 12px 16px; text-align: center; }
+
+  details.help { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin: 12px 0; }
+  details.help summary { cursor: pointer; font-weight: 600; }
+
+  .snackbar { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 24px; box-shadow: var(--shadow); z-index: 200; max-width: 90vw; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <h1 id="topbar-title">Stadstur</h1>
+  <div class="actions">
+    <button class="icon-btn" id="btn-home" title="Hem">⌂</button>
+    <button class="icon-btn" id="btn-settings" title="Inställningar">⚙</button>
+  </div>
+</header>
+
+<main id="app" class="view"></main>
+
+<div id="snackbar-container"></div>
+
+<script>
+/* ============ State ============ */
+const App = {
+  view: 'start',
+  tour: null,
+  tourId: null,
+  progress: null,
+  active: false,
+  activeWaypointIdx: 0,
+  position: null,
+  positionAccuracy: null,
+  watchId: null,
+  wakeLock: null,
+  startedAt: null,
+  ttsAudio: null,
+  ttsPlaying: false,
+};
+
+const Settings = {
+  load() {
+    try { return JSON.parse(localStorage.getItem('settings')) || {}; } catch { return {}; }
+  },
+  save(s) { localStorage.setItem('settings', JSON.stringify(s)); },
+  get(key, def) { const s = this.load(); return s[key] !== undefined ? s[key] : def; },
+  set(key, value) { const s = this.load(); s[key] = value; this.save(s); },
+};
+
+/* ============ Utils ============ */
+function $(sel, parent = document) { return parent.querySelector(sel); }
+function $$(sel, parent = document) { return [...parent.querySelectorAll(sel)]; }
+function el(tag, attrs = {}, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (v !== null && v !== undefined && v !== false) e.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c == null || c === false) continue;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+function haversine(a, b) {
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(b[0] - a[0]);
+  const dLng = toRad(b[1] - a[1]);
+  const lat1 = toRad(a[0]); const lat2 = toRad(b[0]);
+  const x = Math.sin(dLat/2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng/2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+function bearing(a, b) {
+  const toRad = d => d * Math.PI / 180;
+  const toDeg = r => r * 180 / Math.PI;
+  const dLng = toRad(b[1] - a[1]);
+  const lat1 = toRad(a[0]); const lat2 = toRad(b[0]);
+  const y = Math.sin(dLng) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+  return (toDeg(Math.atan2(y, x)) + 360) % 360;
+}
+function fmtDist(m) {
+  if (m == null) return '—';
+  if (m < 1000) return Math.round(m) + ' m';
+  return (m/1000).toFixed(m < 10000 ? 1 : 0) + ' km';
+}
+function snackbar(msg, ms = 3000) {
+  const s = el('div', { class: 'snackbar' }, msg);
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), ms);
+}
+function hashStr(str) {
+  let h = 0; for (let i = 0; i < str.length; i++) { h = ((h<<5)-h) + str.charCodeAt(i); h |= 0; }
+  return String(h);
+}
+
+/* ============ Storage ============ */
+function loadIndex() {
+  try { return JSON.parse(localStorage.getItem('tours::index')) || []; } catch { return []; }
+}
+function saveIndex(idx) { localStorage.setItem('tours::index', JSON.stringify(idx)); }
+function saveTour(tour) {
+  const id = tour.tour.id;
+  localStorage.setItem(`tour::${id}::data`, JSON.stringify(tour));
+  const idx = loadIndex().filter(t => t.id !== id);
+  idx.unshift({ id, title: tour.tour.title, city: tour.tour.city, imported_at: new Date().toISOString() });
+  saveIndex(idx);
+}
+function loadTour(id) {
+  try { return JSON.parse(localStorage.getItem(`tour::${id}::data`)); } catch { return null; }
+}
+function loadProgress(id) {
+  try { return JSON.parse(localStorage.getItem(`tour::${id}::progress`)) || { visited: [], skipped: [], notes: {} }; }
+  catch { return { visited: [], skipped: [], notes: {} }; }
+}
+function saveProgress(id, p) { localStorage.setItem(`tour::${id}::progress`, JSON.stringify(p)); }
+function deleteTour(id) {
+  localStorage.removeItem(`tour::${id}::data`);
+  localStorage.removeItem(`tour::${id}::progress`);
+  saveIndex(loadIndex().filter(t => t.id !== id));
+}
+
+/* ============ Validation ============ */
+function validateTour(data) {
+  const errors = [];
+  if (!data || typeof data !== 'object') return ['Filen är inte ett giltigt JSON-objekt.'];
+  if (!data.schema_version) errors.push('schema_version saknas.');
+  if (!data.tour || typeof data.tour !== 'object') errors.push('tour saknas.');
+  else {
+    for (const f of ['id', 'title', 'city', 'language', 'duration_minutes', 'distance_km', 'difficulty', 'start_coordinates']) {
+      if (data.tour[f] === undefined) errors.push(`tour.${f} saknas.`);
+    }
+    const sc = data.tour.start_coordinates;
+    if (sc && (!Array.isArray(sc) || sc.length !== 2 || Math.abs(sc[0]) > 90 || Math.abs(sc[1]) > 180)) errors.push('tour.start_coordinates är ogiltig.');
+  }
+  if (!Array.isArray(data.waypoints) || data.waypoints.length < 3) errors.push('Minst 3 waypoints krävs.');
+  else {
+    data.waypoints.forEach((w, i) => {
+      for (const f of ['id', 'order', 'title', 'coordinates', 'short', 'narrative']) {
+        if (w[f] === undefined) errors.push(`waypoints[${i}].${f} saknas.`);
+      }
+      if (w.coordinates && (!Array.isArray(w.coordinates) || w.coordinates.length !== 2 || Math.abs(w.coordinates[0]) > 90 || Math.abs(w.coordinates[1]) > 180)) errors.push(`waypoints[${i}].coordinates ogiltig.`);
+      if (w.order !== i + 1) errors.push(`waypoints[${i}].order ska vara ${i+1}, är ${w.order}.`);
+    });
+  }
+  return errors;
+}
+
+/* ============ Render ============ */
+const root = $('#app');
+function render() {
+  if (App.view === 'start') return renderStart();
+  if (App.view === 'overview') return renderOverview();
+  if (App.view === 'active') return renderActive();
+  if (App.view === 'summary') return renderSummary();
+  if (App.view === 'settings') return renderSettings();
+}
+
+function setTitle(t) { $('#topbar-title').textContent = t || 'Stadstur'; }
+
+/* --- Start view --- */
+function renderStart() {
+  setTitle('Stadstur');
+  root.innerHTML = '';
+  const drop = el('label', { class: 'drop' },
+    el('div', {}, '📍'),
+    el('div', { html: '<strong>Släpp en tour.json här</strong>' }),
+    el('div', { class: 'dim' }, 'eller klicka för att välja fil'),
+    el('input', { type: 'file', accept: '.json,application/json', onchange: e => handleFile(e.target.files[0]) })
+  );
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('over');
+    const f = e.dataTransfer.files[0]; if (f) handleFile(f);
+  });
+  root.appendChild(drop);
+
+  const idx = loadIndex();
+  if (idx.length) {
+    root.appendChild(el('h2', {}, 'Sparade turer'));
+    const list = el('div', { class: 'tour-list' });
+    for (const t of idx) {
+      const card = el('div', { class: 'card clickable', onclick: () => openTour(t.id) },
+        el('div', { class: 'meta' },
+          el('strong', {}, t.title),
+          el('small', {}, `${t.city} · importerad ${new Date(t.imported_at).toLocaleDateString()}`)
+        ),
+        el('button', { class: 'icon-btn', onclick: e => { e.stopPropagation(); if (confirm('Ta bort denna tur?')) { deleteTour(t.id); render(); } } }, '✕')
+      );
+      list.appendChild(card);
+    }
+    root.appendChild(list);
+  }
+
+  const help = el('details', { class: 'help' },
+    el('summary', {}, 'Hur skapar jag en tur?'),
+    el('p', {}, 'Be din AI-assistent (Claude, ChatGPT m.fl.) skapa en tur. Installera skill-paketet city-tour-creator för bästa resultat, eller klistra in dess SKILL.md i samtalet. Be t.ex.: "Skapa en 90-minuters litterär stadstur i Lissabon, på svenska." Spara svaret som en .json-fil och släpp den här.'),
+  );
+  root.appendChild(help);
+}
+
+async function handleFile(file) {
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const errs = validateTour(data);
+    if (errs.length) return showErrors(errs);
+    saveTour(data);
+    openTour(data.tour.id);
+  } catch (e) {
+    showErrors(['Kunde inte läsa filen: ' + e.message]);
+  }
+}
+
+function showErrors(errs) {
+  const msg = errs.join('\n');
+  const modal = openModal(
+    el('div', {},
+      el('h2', {}, 'Ogiltig tur-fil'),
+      el('pre', { style: 'white-space:pre-wrap; background:var(--bg-elev); padding:12px; border-radius:8px; font-size:0.85rem;' }, msg),
+      el('div', { class: 'btn-row' },
+        el('button', { class: 'btn secondary', onclick: () => { navigator.clipboard.writeText(msg); snackbar('Kopierat'); } }, 'Kopiera felmeddelandet'),
+        el('button', { class: 'btn', onclick: () => closeModal() }, 'OK')
+      )
+    )
+  );
+}
+
+/* --- Overview --- */
+let overviewMap = null;
+function renderOverview() {
+  const t = App.tour.tour;
+  setTitle(t.title);
+  root.innerHTML = '';
+  root.appendChild(el('div', {},
+    el('h1', {}, t.title),
+    el('div', { class: 'dim' }, `${t.city}${t.country ? ', ' + t.country : ''} · ${t.duration_minutes} min · ${t.distance_km} km · ${t.difficulty}${t.theme ? ' · ' + t.theme : ''}`),
+  ));
+
+  const mapDiv = el('div', { id: 'map' });
+  root.appendChild(mapDiv);
+
+  const continueBtn = App.progress.visited.length > 0 && App.progress.visited.length < App.tour.waypoints.length
+    ? el('button', { class: 'btn', onclick: () => startTour(false) }, `Återuppta — stopp ${App.progress.visited.length + 1}`)
+    : null;
+
+  root.appendChild(el('div', { class: 'btn-row' },
+    continueBtn || el('button', { class: 'btn', onclick: () => startTour(true) }, 'Starta tur från första punkten'),
+    el('button', { class: 'btn secondary', onclick: () => startTour(false, 'free') }, 'Free-roam'),
+  ));
+
+  if (t.intro_narrative) {
+    root.appendChild(el('details', { class: 'help' },
+      el('summary', {}, 'Intro'),
+      el('p', { class: 'narrative' }, t.intro_narrative)
+    ));
+  }
+
+  root.appendChild(el('h2', {}, 'Waypoints'));
+  const list = el('div', {});
+  App.tour.waypoints.forEach((w, i) => {
+    const visited = App.progress.visited.includes(w.id);
+    const row = el('div', { class: `wp-row ${visited ? 'visited' : ''} ${w.optional ? 'optional' : ''}`, onclick: () => showWaypointModal(i, false) },
+      el('div', { class: 'wp-num' }, String(w.order)),
+      el('div', { class: 'wp-body' },
+        el('strong', {}, w.title),
+        el('small', {}, w.short)
+      )
+    );
+    list.appendChild(row);
+  });
+  root.appendChild(list);
+
+  root.appendChild(el('div', { class: 'footer-attr' }, 'Karta © OpenStreetMap-bidragsgivare'));
+
+  setTimeout(() => initOverviewMap(), 50);
+}
+
+function initOverviewMap() {
+  if (overviewMap) { overviewMap.remove(); overviewMap = null; }
+  const t = App.tour.tour;
+  overviewMap = L.map('map', { zoomControl: true }).setView(t.start_coordinates, 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap', maxZoom: 19
+  }).addTo(overviewMap);
+
+  const coords = App.tour.waypoints.map(w => w.coordinates);
+  L.polyline(coords, { color: '#2563eb', weight: 4, opacity: 0.6 }).addTo(overviewMap);
+
+  App.tour.waypoints.forEach((w, i) => {
+    const visited = App.progress.visited.includes(w.id);
+    const cls = `wp-pin ${visited ? 'visited' : ''} ${w.optional ? 'optional' : ''}`;
+    const icon = L.divIcon({ className: '', html: `<div class="${cls}">${w.order}</div>`, iconSize: [30,30], iconAnchor: [15,15] });
+    const m = L.marker(w.coordinates, { icon }).addTo(overviewMap);
+    m.bindPopup(`<strong>${w.title}</strong><br>${w.short}`);
+    m.on('click', () => showWaypointModal(i, false));
+  });
+
+  if (t.map_bounds) overviewMap.fitBounds(t.map_bounds);
+  else overviewMap.fitBounds(coords, { padding: [40, 40] });
+}
+
+/* --- Active tour --- */
+let activeMap = null;
+let userMarker = null;
+let userAccCircle = null;
+let activeMarkers = [];
+
+function startTour(fromStart, mode) {
+  App.active = true;
+  App.startedAt = App.startedAt || new Date().toISOString();
+  if (fromStart) App.activeWaypointIdx = 0;
+  else {
+    const nextIdx = App.tour.waypoints.findIndex(w => !App.progress.visited.includes(w.id));
+    App.activeWaypointIdx = nextIdx >= 0 ? nextIdx : 0;
+  }
+  App.view = 'active';
+  startGeolocation();
+  acquireWakeLock();
+  render();
+}
+
+function renderActive() {
+  const wps = App.tour.waypoints;
+  const wp = wps[App.activeWaypointIdx];
+  setTitle(`${App.activeWaypointIdx + 1} / ${wps.length}`);
+  root.innerHTML = '';
+
+  root.appendChild(el('div', {},
+    el('strong', {}, `Stopp ${App.activeWaypointIdx + 1} av ${wps.length} — ${wp.title}`),
+    el('div', { class: 'progress' }, el('div', { style: `width:${(App.progress.visited.length / wps.length * 100).toFixed(0)}%` }))
+  ));
+
+  let distText = '—', bearingText = '—', accText = '';
+  if (App.position && wp.coordinates) {
+    const d = haversine(App.position, wp.coordinates);
+    distText = fmtDist(d);
+    const b = bearing(App.position, wp.coordinates);
+    bearingText = compassText(b);
+    if (App.positionAccuracy) accText = `±${Math.round(App.positionAccuracy)} m GPS`;
+  }
+  root.appendChild(el('div', { class: 'live' },
+    el('div', { class: 'card' }, el('div', { class: 'dim' }, 'Avstånd'), el('div', { class: 'big' }, distText), el('small', {}, accText)),
+    el('div', { class: 'card' }, el('div', { class: 'dim' }, 'Riktning'), el('div', { class: 'big' }, bearingText))
+  ));
+
+  root.appendChild(el('div', { id: 'active-map' }));
+
+  root.appendChild(el('div', { class: 'btn-row' },
+    el('button', { class: 'btn', onclick: () => openInMaps(wp.coordinates) }, 'Navigera i Google Maps'),
+    el('button', { class: 'btn secondary', onclick: () => triggerArrival() }, 'Jag är framme'),
+  ));
+  root.appendChild(el('div', { class: 'btn-row' },
+    el('button', { class: 'btn ghost', onclick: () => skipWaypoint() }, 'Hoppa över'),
+    el('button', { class: 'btn ghost', onclick: () => endTour() }, 'Avsluta tur'),
+  ));
+
+  root.appendChild(el('div', { class: 'card' },
+    el('strong', {}, wp.title),
+    el('div', { class: 'dim' }, wp.short),
+    el('div', { class: 'btn-row' },
+      el('button', { class: 'btn secondary', onclick: () => showWaypointModal(App.activeWaypointIdx, true) }, 'Visa kort')
+    )
+  ));
+
+  setTimeout(() => initActiveMap(), 50);
+}
+
+function initActiveMap() {
+  if (activeMap) { activeMap.remove(); activeMap = null; }
+  activeMarkers = [];
+  const wp = App.tour.waypoints[App.activeWaypointIdx];
+  activeMap = L.map('active-map').setView(wp.coordinates, 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 19 }).addTo(activeMap);
+  const coords = App.tour.waypoints.map(w => w.coordinates);
+  L.polyline(coords, { color: '#2563eb', weight: 3, opacity: 0.4 }).addTo(activeMap);
+  App.tour.waypoints.forEach((w, i) => {
+    const visited = App.progress.visited.includes(w.id);
+    const isActive = i === App.activeWaypointIdx;
+    const cls = `wp-pin ${visited ? 'visited' : ''} ${isActive ? 'active' : ''} ${w.optional ? 'optional' : ''}`;
+    const icon = L.divIcon({ className: '', html: `<div class="${cls}">${w.order}</div>`, iconSize: [30,30], iconAnchor: [15,15] });
+    const m = L.marker(w.coordinates, { icon }).addTo(activeMap);
+    activeMarkers.push(m);
+  });
+  updateUserMarker();
+}
+
+function updateUserMarker() {
+  if (!activeMap || !App.position) return;
+  if (!userMarker) {
+    const icon = L.divIcon({ className: '', html: `<div style="width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid white;box-shadow:0 0 0 2px #2563eb;"></div>`, iconSize: [18,18], iconAnchor: [9,9] });
+    userMarker = L.marker(App.position, { icon }).addTo(activeMap);
+  } else userMarker.setLatLng(App.position);
+  if (userAccCircle) userAccCircle.remove();
+  if (App.positionAccuracy) {
+    userAccCircle = L.circle(App.position, { radius: App.positionAccuracy, color: '#2563eb', fillOpacity: 0.08, weight: 1 }).addTo(activeMap);
+  }
+}
+
+function compassText(deg) {
+  const dirs = ['N','NÖ','Ö','SÖ','S','SV','V','NV'];
+  return dirs[Math.round(deg / 45) % 8] + ' ' + Math.round(deg) + '°';
+}
+
+function startGeolocation() {
+  if (App.watchId !== null) return;
+  if (!navigator.geolocation) return snackbar('Geolocation stöds inte i denna webbläsare');
+  App.watchId = navigator.geolocation.watchPosition(
+    pos => {
+      App.position = [pos.coords.latitude, pos.coords.longitude];
+      App.positionAccuracy = pos.coords.accuracy;
+      checkTrigger();
+      if (App.view === 'active') {
+        updateUserMarker();
+        // Light-touch update of distance/bearing
+        const wp = App.tour.waypoints[App.activeWaypointIdx];
+        if (wp) render();
+      }
+    },
+    err => {
+      if (err.code === 1) snackbar('Geolocation nekat — använd manuella triggers');
+      else if (err.code === 2) snackbar('GPS hittar dig inte');
+    },
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+  );
+}
+
+function stopGeolocation() {
+  if (App.watchId !== null) { navigator.geolocation.clearWatch(App.watchId); App.watchId = null; }
+}
+
+function checkTrigger() {
+  if (!App.active || !App.position) return;
+  const wps = App.tour.waypoints;
+  const mult = Settings.get('radius_multiplier', 1.0);
+  for (let i = 0; i < wps.length; i++) {
+    const w = wps[i];
+    if (App.progress.visited.includes(w.id) || App.progress.skipped?.includes(w.id)) continue;
+    const r = (w.trigger_radius_m || 30) * mult;
+    if (haversine(App.position, w.coordinates) <= r) {
+      App.activeWaypointIdx = i;
+      triggerArrival();
+      return;
+    }
+  }
+}
+
+function triggerArrival() {
+  const wp = App.tour.waypoints[App.activeWaypointIdx];
+  if (!wp) return;
+  if (App.progress.visited.includes(wp.id)) return;
+  if (Settings.get('vibrate', true) && navigator.vibrate) navigator.vibrate([100, 50, 100]);
+  showWaypointModal(App.activeWaypointIdx, true);
+}
+
+function skipWaypoint() {
+  const wp = App.tour.waypoints[App.activeWaypointIdx];
+  if (!App.progress.skipped) App.progress.skipped = [];
+  if (!App.progress.skipped.includes(wp.id)) App.progress.skipped.push(wp.id);
+  saveProgress(App.tour.tour.id, App.progress);
+  advance();
+}
+
+function markVisited(idx) {
+  const wp = App.tour.waypoints[idx];
+  if (!App.progress.visited.includes(wp.id)) App.progress.visited.push(wp.id);
+  saveProgress(App.tour.tour.id, App.progress);
+}
+
+function advance() {
+  closeModal();
+  const wps = App.tour.waypoints;
+  if (App.activeWaypointIdx + 1 < wps.length) {
+    App.activeWaypointIdx++;
+    render();
+  } else {
+    endTour();
+  }
+}
+
+function endTour() {
+  stopTTS();
+  App.active = false;
+  App.view = 'summary';
+  stopGeolocation();
+  releaseWakeLock();
+  render();
+}
+
+/* --- Waypoint modal --- */
+let modalEl = null;
+function openModal(content) {
+  closeModal();
+  const backdrop = el('div', { class: 'modal-backdrop', onclick: e => { if (e.target === backdrop) closeModal(); } },
+    el('div', { class: 'modal' }, content)
+  );
+  document.body.appendChild(backdrop);
+  modalEl = backdrop;
+  return backdrop;
+}
+function closeModal() { if (modalEl) { modalEl.remove(); modalEl = null; } stopTTS(); }
+
+async function showWaypointModal(idx, isArrival) {
+  const wp = App.tour.waypoints[idx];
+  const t = App.tour.tour;
+  const visited = App.progress.visited.includes(wp.id);
+
+  const imagesDiv = el('div', { class: 'wp-images' });
+  const linksDiv = el('div', { class: 'links' });
+
+  const noteVal = (App.progress.notes && App.progress.notes[wp.id]) || '';
+
+  const content = el('div', {},
+    el('div', { class: 'modal-header' },
+      el('div', {},
+        el('h2', {}, wp.title),
+        el('div', { class: 'dim' }, wp.short)
+      ),
+      el('button', { class: 'close', onclick: () => closeModal() }, '✕')
+    ),
+    imagesDiv,
+    el('div', { class: 'narrative' }, wp.narrative),
+    wp.trivia && wp.trivia.length ? el('div', { class: 'trivia' },
+      el('strong', {}, 'Visste du:'),
+      el('ul', {}, wp.trivia.map(t => el('li', {}, t)))
+    ) : null,
+    wp.accessibility_notes ? el('div', { class: 'banner warn' }, '♿ ' + wp.accessibility_notes) : null,
+    wp.walk_to_next && idx < App.tour.waypoints.length - 1 ? el('div', { class: 'card' },
+      el('strong', {}, 'Till nästa stopp'),
+      el('div', {}, `${fmtDist(wp.walk_to_next.distance_m)} · ~${wp.walk_to_next.estimated_minutes} min`),
+      wp.walk_to_next.directions_hint ? el('div', { class: 'dim' }, wp.walk_to_next.directions_hint) : null
+    ) : null,
+    linksDiv,
+    el('div', { class: 'btn-row' },
+      el('button', { class: 'btn secondary', onclick: () => playTTS(wp.narrative, t.language) }, '🔊 Läs upp'),
+      el('button', { class: 'btn secondary', onclick: () => openInMaps(wp.coordinates) }, 'Maps')
+    ),
+    el('label', {}, 'Anteckning'),
+    el('textarea', { oninput: e => { App.progress.notes = App.progress.notes || {}; App.progress.notes[wp.id] = e.target.value; saveProgress(App.tour.tour.id, App.progress); } }, noteVal),
+    App.active ? el('div', { class: 'btn-row' },
+      el('button', { class: 'btn', onclick: () => { markVisited(idx); advance(); } }, visited ? 'Nästa stopp' : 'Klar — gå vidare')
+    ) : null
+  );
+
+  openModal(content);
+  loadWaypointImages(wp, t, imagesDiv);
+  renderLinks(wp.links || [], linksDiv);
+
+  // Auto-play TTS on arrival if enabled
+  if (isArrival && Settings.get('autoplay', true)) {
+    setTimeout(() => playTTS(wp.narrative, t.language), 400);
+  }
+}
+
+async function loadWaypointImages(wp, tour, container) {
+  const imgs = wp.images || [];
+  for (const img of imgs) {
+    if (img.source === 'wikipedia') {
+      const lang = img.lang || tour.language || 'en';
+      try {
+        const data = await fetchWikiSummary(lang, img.article);
+        if (data && data.thumbnail && data.thumbnail.source) {
+          const im = el('img', { src: data.originalimage?.source || data.thumbnail.source, alt: wp.title, loading: 'lazy' });
+          im.onerror = () => im.remove();
+          container.appendChild(im);
+        }
+      } catch { /* skip */ }
+    } else if (img.source === 'search_query') {
+      const a = el('a', { class: 'img-search', href: `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(img.query)}`, target: '_blank', rel: 'noopener noreferrer' }, '🔍 Visa bilder');
+      container.appendChild(a);
+    }
+  }
+}
+
+async function fetchWikiSummary(lang, slug) {
+  const key = `wiki::${lang}::${slug}`;
+  try {
+    const cached = JSON.parse(localStorage.getItem(key));
+    if (cached && Date.now() - cached.fetched_at < 30*24*60*60*1000) return cached.data;
+  } catch {}
+  const res = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(slug)}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  try { localStorage.setItem(key, JSON.stringify({ data, fetched_at: Date.now() })); } catch {}
+  return data;
+}
+
+function renderLinks(links, container) {
+  container.innerHTML = '';
+  for (const l of links.slice(0, 4)) {
+    container.appendChild(el('a', { href: l.url, target: '_blank', rel: 'noopener noreferrer' }, l.label));
+  }
+}
+
+/* --- TTS --- */
+function stopTTS() {
+  if (App.ttsAudio) { App.ttsAudio.pause(); App.ttsAudio = null; }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  App.ttsPlaying = false;
+}
+
+async function playTTS(text, lang) {
+  stopTTS();
+  const provider = Settings.get('tts_provider', 'web');
+  if (provider === 'openai') {
+    const key = localStorage.getItem('byok::openai');
+    if (!key) { snackbar('Ingen OpenAI-nyckel — använder Web Speech'); return webSpeech(text, lang); }
+    try {
+      const voice = Settings.get('openai_voice', 'alloy');
+      const res = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'tts-1', voice, input: text })
+      });
+      if (!res.ok) { snackbar('OpenAI TTS misslyckades — kontrollera nyckel'); return webSpeech(text, lang); }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      App.ttsAudio = new Audio(url);
+      App.ttsAudio.play(); App.ttsPlaying = true;
+    } catch {
+      webSpeech(text, lang);
+    }
+  } else if (provider === 'elevenlabs') {
+    const key = localStorage.getItem('byok::elevenlabs');
+    const voiceId = Settings.get('elevenlabs_voice', '21m00Tcm4TlvDq8ikWAM');
+    if (!key) { snackbar('Ingen ElevenLabs-nyckel — använder Web Speech'); return webSpeech(text, lang); }
+    try {
+      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST',
+        headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2' })
+      });
+      if (!res.ok) { snackbar('ElevenLabs TTS misslyckades'); return webSpeech(text, lang); }
+      const blob = await res.blob();
+      App.ttsAudio = new Audio(URL.createObjectURL(blob));
+      App.ttsAudio.play(); App.ttsPlaying = true;
+    } catch { webSpeech(text, lang); }
+  } else {
+    webSpeech(text, lang);
+  }
+}
+
+function webSpeech(text, lang) {
+  if (!window.speechSynthesis) return snackbar('Uppläsning stöds inte');
+  const u = new SpeechSynthesisUtterance(text);
+  if (lang) u.lang = lang.length === 2 ? lang + '-' + lang.toUpperCase() : lang;
+  speechSynthesis.speak(u);
+  App.ttsPlaying = true;
+}
+
+/* --- Maps deep-link --- */
+function openInMaps(coords) {
+  const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=walking`;
+  if (isApple && confirm('Öppna i Apple Maps? (Avbryt = Google Maps)')) {
+    window.location.href = `maps://maps.apple.com/?daddr=${coords[0]},${coords[1]}&dirflg=w`;
+  } else {
+    window.open(gmaps, '_blank');
+  }
+}
+
+/* --- Wake Lock --- */
+async function acquireWakeLock() {
+  if (!Settings.get('wake_lock', true)) return;
+  if (!('wakeLock' in navigator)) return;
+  try { App.wakeLock = await navigator.wakeLock.request('screen'); } catch {}
+}
+function releaseWakeLock() { if (App.wakeLock) { App.wakeLock.release(); App.wakeLock = null; } }
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && App.active) acquireWakeLock();
+});
+
+/* --- Summary --- */
+function renderSummary() {
+  const t = App.tour.tour;
+  setTitle('Sammanfattning');
+  root.innerHTML = '';
+  const startedAt = App.startedAt ? new Date(App.startedAt) : new Date();
+  const elapsed = Math.round((Date.now() - startedAt.getTime()) / 60000);
+  root.appendChild(el('h1', {}, 'Turen är klar'));
+  if (t.outro_narrative) root.appendChild(el('div', { class: 'card narrative' }, t.outro_narrative));
+  root.appendChild(el('div', { class: 'card' },
+    el('div', {}, `Besökta: ${App.progress.visited.length} / ${App.tour.waypoints.length}`),
+    el('div', {}, `Hoppade över: ${(App.progress.skipped || []).length}`),
+    el('div', {}, `Tid: ${elapsed} min`)
+  ));
+  const notes = App.progress.notes || {};
+  const hasNotes = Object.values(notes).some(v => v && v.trim());
+  if (hasNotes) {
+    root.appendChild(el('h2', {}, 'Anteckningar'));
+    App.tour.waypoints.forEach(w => {
+      if (notes[w.id]) {
+        root.appendChild(el('div', { class: 'card' },
+          el('strong', {}, w.title),
+          el('div', { class: 'narrative' }, notes[w.id])
+        ));
+      }
+    });
+  }
+  root.appendChild(el('div', { class: 'btn-row' },
+    el('button', { class: 'btn secondary', onclick: () => exportMarkdown() }, 'Exportera markdown'),
+    el('button', { class: 'btn secondary', onclick: () => { App.progress = { visited: [], skipped: [], notes: {} }; saveProgress(App.tour.tour.id, App.progress); App.startedAt = null; App.view = 'overview'; render(); } }, 'Starta om'),
+    el('button', { class: 'btn ghost', onclick: () => goHome() }, 'Tillbaka')
+  ));
+}
+
+function exportMarkdown() {
+  const t = App.tour.tour;
+  const notes = App.progress.notes || {};
+  let md = `# ${t.title}\n\n${t.city} · ${new Date().toLocaleDateString()}\n\n`;
+  App.tour.waypoints.forEach(w => {
+    md += `## ${w.order}. ${w.title}\n\n${w.short}\n\n`;
+    if (notes[w.id]) md += `> ${notes[w.id]}\n\n`;
+  });
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `${t.id}-notes.md`; a.click();
+}
+
+/* --- Settings --- */
+function renderSettings() {
+  setTitle('Inställningar');
+  root.innerHTML = '';
+  const s = Settings.load();
+  const openaiKey = localStorage.getItem('byok::openai') || '';
+  const elevenKey = localStorage.getItem('byok::elevenlabs') || '';
+
+  root.appendChild(el('h1', {}, 'Inställningar'));
+
+  root.appendChild(el('h2', {}, 'Röstuppläsning'));
+  const provSel = el('select', {},
+    el('option', { value: 'web' }, 'Web Speech (gratis, varierande kvalitet)'),
+    el('option', { value: 'openai' }, 'OpenAI TTS (BYOK)'),
+    el('option', { value: 'elevenlabs' }, 'ElevenLabs (BYOK)'),
+  );
+  provSel.value = s.tts_provider || 'web';
+  provSel.addEventListener('change', () => Settings.set('tts_provider', provSel.value));
+  root.appendChild(el('label', {}, 'Provider')); root.appendChild(provSel);
+
+  root.appendChild(el('div', { class: 'banner warn' }, 'API-nycklar lagras lokalt i din webbläsare. Använd en separat nyckel med utgiftsgräns.'));
+
+  root.appendChild(el('label', {}, 'OpenAI API-nyckel'));
+  const openaiInput = el('input', { type: 'password', placeholder: 'sk-...' });
+  openaiInput.value = openaiKey;
+  openaiInput.addEventListener('change', () => {
+    if (openaiInput.value) localStorage.setItem('byok::openai', openaiInput.value);
+    else localStorage.removeItem('byok::openai');
+    snackbar('OpenAI-nyckel sparad');
+  });
+  root.appendChild(openaiInput);
+
+  const voiceSel = el('select', {}, ...['alloy','echo','fable','onyx','nova','shimmer'].map(v => el('option', { value: v }, v)));
+  voiceSel.value = s.openai_voice || 'alloy';
+  voiceSel.addEventListener('change', () => Settings.set('openai_voice', voiceSel.value));
+  root.appendChild(el('label', {}, 'OpenAI röst')); root.appendChild(voiceSel);
+
+  root.appendChild(el('label', {}, 'ElevenLabs API-nyckel'));
+  const elInput = el('input', { type: 'password', placeholder: 'xi-...' });
+  elInput.value = elevenKey;
+  elInput.addEventListener('change', () => {
+    if (elInput.value) localStorage.setItem('byok::elevenlabs', elInput.value);
+    else localStorage.removeItem('byok::elevenlabs');
+    snackbar('ElevenLabs-nyckel sparad');
+  });
+  root.appendChild(elInput);
+
+  root.appendChild(el('h2', {}, 'Tur-beteende'));
+  root.appendChild(el('label', {}, 'Trigger-radie multiplikator (1.0 = standard)'));
+  const radInput = el('input', { type: 'number', min: '1', max: '3', step: '0.1' });
+  radInput.value = s.radius_multiplier || 1.0;
+  radInput.addEventListener('change', () => Settings.set('radius_multiplier', parseFloat(radInput.value)));
+  root.appendChild(radInput);
+
+  for (const [key, label, def] of [['autoplay','Auto-spela röst vid framme', true],['vibrate','Vibrera vid framme', true],['wake_lock','Håll skärm på under tur', true]]) {
+    const cb = el('input', { type: 'checkbox' });
+    cb.checked = s[key] !== undefined ? s[key] : def;
+    cb.addEventListener('change', () => Settings.set(key, cb.checked));
+    const wrap = el('label', { style: 'display:flex; align-items:center; gap:8px;' }, cb, label);
+    root.appendChild(wrap);
+  }
+
+  root.appendChild(el('h2', {}, 'Rensa'));
+  root.appendChild(el('div', { class: 'btn-row' },
+    el('button', { class: 'btn danger', onclick: () => {
+      if (confirm('Radera alla turer, framsteg och inställningar?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }}, 'Rensa allt')
+  ));
+}
+
+/* --- Navigation --- */
+function openTour(id) {
+  const tour = loadTour(id);
+  if (!tour) return snackbar('Turen kunde inte laddas');
+  App.tour = tour;
+  App.tourId = id;
+  App.progress = loadProgress(id);
+  App.startedAt = null;
+  App.view = 'overview';
+  render();
+}
+
+function goHome() {
+  stopGeolocation(); releaseWakeLock(); stopTTS();
+  App.active = false;
+  App.tour = null;
+  App.tourId = null;
+  App.view = 'start';
+  render();
+}
+
+$('#btn-home').addEventListener('click', goHome);
+$('#btn-settings').addEventListener('click', () => { App.view = 'settings'; render(); });
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* --- Boot --- */
+render();
+</script>
+
+</body>
+</html>

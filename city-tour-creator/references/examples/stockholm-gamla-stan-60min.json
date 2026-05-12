@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0",
+  "tour": {
+    "id": "stockholm-gamla-stan-60min",
+    "title": "Gamla stan — kungar, kättare och kuggar",
+    "city": "Stockholm",
+    "country": "SE",
+    "language": "sv",
+    "theme": "Medeltidshistoria",
+    "duration_minutes": 60,
+    "distance_km": 2.1,
+    "difficulty": "easy",
+    "start_coordinates": [59.3258, 18.0717],
+    "intro_narrative": "Gamla stan är en ö, vilket folk ofta glömmer. Den är också ett av Europas bäst bevarade medeltida stadskärnor — men inte för att man har bevarat den, utan för att man har varit för fattig för att riva den. Sex stopp, en timme, och en historia om varför Stockholm överhuvudtaget hamnade här.",
+    "outro_narrative": "Tack för sällskapet. Slussen-stationen ligger en kort promenad söderut, eller så stannar du kvar och hittar en bryggerikrog. De är inte alla nya."
+  },
+  "waypoints": [
+    {
+      "id": "wp-01",
+      "order": 1,
+      "title": "Stortorget",
+      "coordinates": [59.3253, 18.0708],
+      "trigger_radius_m": 40,
+      "short": "Stockholms äldsta torg och platsen för Stockholms blodbad.",
+      "narrative": "Här började allt. Stortorget är Stockholms äldsta torg och själva ursprungspunkten för staden. November 1520 stod ett blodbad här — danske kung Kristian II hade just krönts till svensk kung och bjöd in adeln på fest. Festen slutade med åttio avrättningar på tre dagar, och huvudena travade upp i pyramider där pumpen står idag. På Schantzska huset, det röda, kan du räkna ett av varje sten — det sägs vara en sten per dödad. Du kommer att räkna fel; jag har provat. Men poängen är inte räkningen utan minnet.",
+      "images": [
+        { "source": "wikipedia", "article": "Stortorget", "lang": "sv" }
+      ],
+      "links": [
+        { "label": "Wikipedia om blodbadet", "url": "https://sv.wikipedia.org/wiki/Stockholms_blodbad" }
+      ],
+      "walk_to_next": {
+        "distance_m": 180,
+        "estimated_minutes": 3,
+        "directions_hint": "Norrut förbi Börsen, ut mot Slottsbacken — du ser slottet öppna sig till höger."
+      }
+    },
+    {
+      "id": "wp-02",
+      "order": 2,
+      "title": "Storkyrkan",
+      "coordinates": [59.3253, 18.0707],
+      "trigger_radius_m": 25,
+      "short": "Stockholms domkyrka — där S:t Göran och draken bor.",
+      "narrative": "Den har stått här sedan tidigt 1300-tal i någon form. Det är här svenska kungar har krönts, gift sig, och begravts. Gå in om du orkar — det kostar inget för en kort titt. Skulpturen S:t Göran och draken, från 1489, är inte bara en av Europas finaste sengotiska skulpturer; den var också en politisk plakat. Göran är Sten Sture den äldre. Draken är danskarna. Prinsessan är Sverige. När du står framför den står du framför propaganda äldre än de flesta länders flagga.",
+      "images": [
+        { "source": "wikipedia", "article": "Storkyrkan", "lang": "sv" }
+      ],
+      "walk_to_next": {
+        "distance_m": 220,
+        "estimated_minutes": 3,
+        "directions_hint": "Gå tillbaka söderut, in på Köpmangatan — en av öns äldsta gator."
+      }
+    },
+    {
+      "id": "wp-03",
+      "order": 3,
+      "title": "Köpmangatan och Köpmantorget",
+      "coordinates": [59.3252, 18.0728],
+      "trigger_radius_m": 30,
+      "short": "Stadens äldsta omnämnda gata — med en kopia av S:t Göran.",
+      "narrative": "Köpmangatan dök upp i skrift redan 1323, vilket gör den till Stockholms tidigast omnämnda gata. Här bodde och bråkade köpmännen — Stortorget var deras arena, gatan deras kvarter. På Köpmantorget står en utomhuskopia av S:t Göran och draken, gjord 1912. Folk fotograferar den och tror att de fotograferat originalet. Originalet är inomhus, två kvarter bort. Det här är en kopia, men kopian är också äldre än de flesta levande personer, så ge den lite respekt.",
+      "images": [
+        { "source": "search_query", "query": "Köpmangatan Stockholm Gamla Stan" }
+      ],
+      "walk_to_next": {
+        "distance_m": 340,
+        "estimated_minutes": 5,
+        "directions_hint": "Söderut, in i den smala Mårten Trotzigs gränd."
+      }
+    },
+    {
+      "id": "wp-04",
+      "order": 4,
+      "title": "Mårten Trotzigs gränd",
+      "coordinates": [59.3231, 18.0716],
+      "trigger_radius_m": 15,
+      "short": "Stockholms smalaste gata — 90 cm på sitt smalaste.",
+      "narrative": "Nittio centimeter. Stockholms smalaste gata, och en av Europas smalaste. Den heter efter en tysk köpman, Mårten Trotzig, som ägde två fastigheter på var sin sida vid slutet av 1500-talet. Han mördades 1617 — på en handelsresa till Kopparberget, har det sagts, men ingen vet säkert. Gränden var stängd och nedrasad under flera hundra år och öppnades inte igen förrän 1945. Stanna vid mitten. Sträck ut armarna. Det är möjligt.",
+      "images": [
+        { "source": "wikipedia", "article": "M%C3%A5rten_Trotzigs_gr%C3%A4nd", "lang": "sv" }
+      ],
+      "accessibility_notes": "Trappor, mycket smalt. Inte rullstolsvänligt.",
+      "walk_to_next": {
+        "distance_m": 280,
+        "estimated_minutes": 4,
+        "directions_hint": "Västerut mot Riddarholmen — du går över en kort bro."
+      }
+    },
+    {
+      "id": "wp-05",
+      "order": 5,
+      "title": "Riddarholmskyrkan",
+      "coordinates": [59.3252, 18.0644],
+      "trigger_radius_m": 30,
+      "short": "Gravplatsen för svenska kungar — kyrkan utan församling.",
+      "narrative": "Det här är den enda kyrkan i Stockholm som inte har en församling. Den har bara döda. Sedan 1290-talet har nästan varje svensk kung och drottning begravts här — Gustav II Adolf, Karl XII, Gustav III. Den gjutjärnsspiran du ser är från 1841; den första föll i en brand 1835. Märk att kyrkan ser ut som en gigantisk grav från utsidan — det är medvetet. Den är en grav. Gå in om den är öppen. Det är märkligt tyst där, även mitt på sommardagen.",
+      "images": [
+        { "source": "wikipedia", "article": "Riddarholmskyrkan", "lang": "sv" }
+      ],
+      "walk_to_next": {
+        "distance_m": 380,
+        "estimated_minutes": 5,
+        "directions_hint": "Tillbaka över bron, söderut mot Järntorget."
+      }
+    },
+    {
+      "id": "wp-06",
+      "order": 6,
+      "title": "Järntorget",
+      "coordinates": [59.3231, 18.0708],
+      "trigger_radius_m": 35,
+      "short": "Där järnet vägdes — och där Sveriges första bank öppnade.",
+      "narrative": "Stockholm fanns på grund av järn. Bergslagens järn fraktades hit, vägdes på Järntorget, exporterades vidare. Vågboden stod ungefär där brunnen är nu. På torgets norra sida — där Banco-huset står — öppnade Sveriges Riksbank 1668, världens äldsta centralbank som fortfarande är i drift. Det är inte vykortsvackert men det är historien. Vi avslutar här. Slussen är fem minuter söderut, T-Centralen tio minuter åt andra hållet. Tack för sällskapet.",
+      "images": [
+        { "source": "wikipedia", "article": "J%C3%A4rntorget,_Stockholm", "lang": "sv" }
+      ]
+    }
+  ]
+}

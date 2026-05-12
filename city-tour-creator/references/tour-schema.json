@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/tour-schema.json",
+  "title": "City Tour",
+  "type": "object",
+  "required": ["schema_version", "tour", "waypoints"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "tour": {
+      "type": "object",
+      "required": ["id", "title", "city", "language", "duration_minutes", "distance_km", "difficulty", "start_coordinates"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "URL-säker slug" },
+        "title": { "type": "string" },
+        "city": { "type": "string" },
+        "country": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "ISO 3166-1 alpha-2" },
+        "language": { "type": "string", "description": "BCP 47, t.ex. sv eller en-US" },
+        "theme": { "type": "string" },
+        "duration_minutes": { "type": "integer", "minimum": 15, "maximum": 480 },
+        "distance_km": { "type": "number", "minimum": 0.2, "maximum": 30 },
+        "difficulty": { "enum": ["easy", "moderate", "demanding"] },
+        "intro_narrative": { "type": "string" },
+        "outro_narrative": { "type": "string" },
+        "start_coordinates": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2, "maxItems": 2,
+          "description": "[lat, lng]"
+        },
+        "map_bounds": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+          "minItems": 2, "maxItems": 2,
+          "description": "[[s,w],[n,e]]"
+        },
+        "attribution": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "waypoints": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "order", "title", "coordinates", "short", "narrative"],
+        "properties": {
+          "id": { "type": "string" },
+          "order": { "type": "integer", "minimum": 1 },
+          "title": { "type": "string" },
+          "coordinates": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2, "maxItems": 2
+          },
+          "trigger_radius_m": { "type": "integer", "minimum": 15, "maximum": 80, "default": 30 },
+          "short": { "type": "string", "maxLength": 140 },
+          "narrative": { "type": "string", "minLength": 50 },
+          "narrative_seconds_estimate": { "type": "integer" },
+          "images": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": ["source", "article"],
+                  "properties": {
+                    "source": { "const": "wikipedia" },
+                    "article": { "type": "string", "description": "URL-slug, ej article title med mellanslag" },
+                    "lang": { "type": "string" },
+                    "thumb_only": { "type": "boolean" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["source", "query"],
+                  "properties": {
+                    "source": { "const": "search_query" },
+                    "query": { "type": "string" }
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": ["source", "path"],
+                  "properties": {
+                    "source": { "const": "local" },
+                    "path": { "type": "string" }
+                  }
+                }
+              ]
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["label", "url"],
+              "properties": {
+                "label": { "type": "string" },
+                "url": { "type": "string", "pattern": "^https://" }
+              }
+            }
+          },
+          "trivia": { "type": "array", "items": { "type": "string" } },
+          "walk_to_next": {
+            "type": "object",
+            "properties": {
+              "distance_m": { "type": "integer", "minimum": 0 },
+              "estimated_minutes": { "type": "integer", "minimum": 0 },
+              "directions_hint": { "type": "string" }
+            }
+          },
+          "accessibility_notes": { "type": "string" },
+          "optional": { "type": "boolean", "default": false }
+        }
+      }
+    }
+  }
+}

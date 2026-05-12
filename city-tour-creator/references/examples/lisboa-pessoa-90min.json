@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0",
+  "tour": {
+    "id": "lisboa-pessoa-90min",
+    "title": "Pessoas Lissabon",
+    "city": "Lisboa",
+    "country": "PT",
+    "language": "sv",
+    "theme": "Litteraturhistoria",
+    "duration_minutes": 90,
+    "distance_km": 3.6,
+    "difficulty": "moderate",
+    "start_coordinates": [38.7108, -9.1431],
+    "intro_narrative": "Fernando Pessoa levde nästan hela sitt liv inom en kvadratkilometer i Lissabon. Vi går den kvadratkilometern. Han skrev under fyra olika namn samtidigt — Caeiro, Reis, Campos, och Pessoa själv — och beskrev staden som inte en plats utan ett tillstånd. Idag är spåren av honom överallt om man vet var man tittar: ett café, en bokhandel, en gravsten, en bronsstaty som han hade hatat. Vi börjar med kaffet.",
+    "outro_narrative": "Vi slutar här, vid Tejo. Pessoa skrev en gång att floden i hans by var Tejo, för att hans by var Lissabon, och alla floder rann genom hans by. Resten av världen kunde vänta. Tack för sällskapet.",
+    "attribution": "Wikipedia, Casa Fernando Pessoa, Pessoa: A Biography (Zenith)"
+  },
+  "waypoints": [
+    {
+      "id": "wp-01",
+      "order": 1,
+      "title": "Café A Brasileira",
+      "coordinates": [38.7108, -9.1431],
+      "trigger_radius_m": 25,
+      "short": "Pessoas dagliga café — bronsstatyn sitter där ute.",
+      "narrative": "Här satt han, nästan varje eftermiddag mellan 1905 och 1935. Beställ en bica — det de kallar espresso här — och stå hellre vid baren än utomhus. Det är där han skulle stå. Pessoa skrev under fyra olika namn samtidigt; en kollega i affärsbanken hörde honom mumla på engelska och trodde att han pratade med sig själv. Han pratade. Det var Alexander Search, en av de fyra. Bronsstatyn där ute satte de upp 1988, femtio år för sent. Han hade hatat den.",
+      "images": [
+        { "source": "wikipedia", "article": "A_Brasileira", "lang": "en" }
+      ],
+      "links": [
+        { "label": "Wikipedia om caféet", "url": "https://en.wikipedia.org/wiki/A_Brasileira" }
+      ],
+      "walk_to_next": {
+        "distance_m": 350,
+        "estimated_minutes": 5,
+        "directions_hint": "Gå nedför Rua Garrett, ner mot Largo do Chiado — bokhandeln ligger till vänster strax efter att gatan svänger."
+      }
+    },
+    {
+      "id": "wp-02",
+      "order": 2,
+      "title": "Livraria Bertrand",
+      "coordinates": [38.7104, -9.1417],
+      "trigger_radius_m": 20,
+      "short": "Världens äldsta verksamma bokhandel — öppen sedan 1732.",
+      "narrative": "Världens äldsta bokhandel i drift. Sedan 1732. Pessoa kom hit för att se sin egen bok i hyllorna — Mensagem, den enda diktsamlingen han gav ut på portugisiska under sin livstid. Den vann ett statligt pris året innan han dog. Han var fyrtiosju. Idag finns en hylla längst bak märkt med hans namn; den fylls på och töms varje vecka. Köp ingenting. Stå bara där en stund och tänk på att han stod på exakt samma trägolv.",
+      "images": [
+        { "source": "wikipedia", "article": "Livraria_Bertrand", "lang": "en" }
+      ],
+      "links": [
+        { "label": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Livraria_Bertrand" }
+      ],
+      "walk_to_next": {
+        "distance_m": 550,
+        "estimated_minutes": 8,
+        "directions_hint": "Vidare nedåt mot Praça do Comércio — du ser triumfbågen och floden längst ner."
+      }
+    },
+    {
+      "id": "wp-03",
+      "order": 3,
+      "title": "Praça do Comércio",
+      "coordinates": [38.7075, -9.1364],
+      "trigger_radius_m": 60,
+      "short": "Det stora torget mot floden — Pessoas spegel för staden.",
+      "narrative": "Stå med ryggen mot floden. Allt det här låg under vatten i tjugo minuter den första november 1755 — först skalvet, sedan branden, sedan vågen. Pessoa skrev om torget som Lissabons ansikte — det ansikte staden visade utåt mot havet, mot imperiet, mot resten av världen. Han brukade gå hit på kvällarna, ensam, och titta på fartygen. Boken som heter Bok av oro — Livro do Desassossego — föddes i de promenaderna. Inte en bok, snarare en kofferts innehåll.",
+      "images": [
+        { "source": "wikipedia", "article": "Pra%C3%A7a_do_Com%C3%A9rcio", "lang": "en" }
+      ],
+      "walk_to_next": {
+        "distance_m": 700,
+        "estimated_minutes": 10,
+        "directions_hint": "Ta hissen i Elevador de Santa Justa upp, eller gå Calçada do Carmo — det är trappor men kortare."
+      }
+    },
+    {
+      "id": "wp-04",
+      "order": 4,
+      "title": "Convento do Carmo",
+      "coordinates": [38.7124, -9.1402],
+      "trigger_radius_m": 30,
+      "short": "Kyrkan utan tak — kvar som den såg ut efter 1755.",
+      "narrative": "De byggde aldrig upp den igen. Det är medvetet. Convento do Carmo står som den såg ut den andra november 1755, dagen efter — taket borta, bågarna kvar, himlen där altartaket var. För Pessoa var Lissabon en stad som aldrig egentligen återhämtade sig från den dagen, och den här kyrkan var beviset. Gå in. Det kostar en slant men det är värt det. Det enda du behöver göra är att stå still och titta upp.",
+      "images": [
+        { "source": "wikipedia", "article": "Carmo_Convent_(Lisbon)", "lang": "en" }
+      ],
+      "links": [
+        { "label": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Carmo_Convent_(Lisbon)" }
+      ],
+      "accessibility_notes": "Trappor upp. Branta gator runt om.",
+      "walk_to_next": {
+        "distance_m": 480,
+        "estimated_minutes": 7,
+        "directions_hint": "Norrut längs Rua da Misericórdia mot Príncipe Real."
+      }
+    },
+    {
+      "id": "wp-05",
+      "order": 5,
+      "title": "Praça do Príncipe Real",
+      "coordinates": [38.7170, -9.1465],
+      "trigger_radius_m": 60,
+      "short": "Trädgården där det enorma cederträdet står.",
+      "narrative": "Mitt på torget står ett cederträd som planterades 1878 och som nu är så stort att man har byggt stålställningar för att hålla upp grenarna. Pessoa bodde fem minuter härifrån de sista femton åren av sitt liv. Han satt här på bänkarna, mest på morgnarna. En annan poet — Mário de Sá-Carneiro — bodde också i området; de var vänner, brevvänner egentligen, fast de bodde i samma stad. Sá-Carneiro tog livet av sig i Paris 1916, tjugofem år gammal. Pessoa skrev till honom i flera år efter det.",
+      "images": [
+        { "source": "wikipedia", "article": "Pr%C3%ADncipe_Real", "lang": "en" },
+        { "source": "search_query", "query": "Príncipe Real cedro Lisboa" }
+      ],
+      "walk_to_next": {
+        "distance_m": 600,
+        "estimated_minutes": 9,
+        "directions_hint": "Västerut mot Campo de Ourique, korsa Rua da Escola Politécnica."
+      }
+    },
+    {
+      "id": "wp-06",
+      "order": 6,
+      "title": "Casa Fernando Pessoa",
+      "coordinates": [38.7160, -9.1620],
+      "trigger_radius_m": 20,
+      "short": "Huset där han bodde sina sista femton år.",
+      "narrative": "Han flyttade hit 1920 och bodde här tills han dog. Femton år, fjärde våningen. Inga möbler av värde, hyrda rum, allting i koffertar — som om han varje vecka var beredd att försvinna. När de öppnade kofferten efter hans död hittade de tjugosju tusen lappar. Dikter, fragment, listor över saker att göra, brev från personer som inte fanns. Tjugosju tusen. Det är allt han egentligen lämnade efter sig — och det räcker. Museet är litet, men gå in. Det är fortfarande hyrda rum.",
+      "images": [
+        { "source": "wikipedia", "article": "Casa_Fernando_Pessoa", "lang": "en" }
+      ],
+      "links": [
+        { "label": "Casa Fernando Pessoa", "url": "https://www.casafernandopessoa.pt/" },
+        { "label": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Casa_Fernando_Pessoa" }
+      ],
+      "trivia": [
+        "Kofferten med 27 000 lappar förvaras nu på Portugals nationalbibliotek.",
+        "Pessoa skrev under minst 75 olika heteronymer — de fyra största fick var sin biografi."
+      ],
+      "walk_to_next": {
+        "distance_m": 550,
+        "estimated_minutes": 8,
+        "directions_hint": "Söderut mot Cemitério dos Prazeres — du följer Rua Coelho da Rocha tills den slutar vid muren."
+      }
+    },
+    {
+      "id": "wp-07",
+      "order": 7,
+      "title": "Cemitério dos Prazeres",
+      "coordinates": [38.7195, -9.1745],
+      "trigger_radius_m": 40,
+      "short": "Hans första gravplats — han flyttades senare till Jerónimos.",
+      "narrative": "Här låg han från 1935 till 1985. Femtio år. Sedan grävde de upp honom och flyttade honom till Jerónimos klostret, bland kungar och upptäcktsresande. Han hade föredragit att stanna här. Prazeres betyder Nöjenas kyrkogård — en konstig översättning, det är inte ett glatt ställe — och om du går in är det stora torra cypresser, gravstenar i rader, en katt eller två. Vandra runt i fem minuter. Du går exakt det varv han skrev om i några av Campos dikter.",
+      "images": [
+        { "source": "wikipedia", "article": "Prazeres_Cemetery", "lang": "en" }
+      ],
+      "accessibility_notes": "Grusgångar.",
+      "walk_to_next": {
+        "distance_m": 380,
+        "estimated_minutes": 6,
+        "directions_hint": "Tillbaka mot Estrela, in i parken."
+      }
+    },
+    {
+      "id": "wp-08",
+      "order": 8,
+      "title": "Jardim da Estrela",
+      "coordinates": [38.7155, -9.1607],
+      "trigger_radius_m": 60,
+      "short": "Parken där turen slutar — vila benen, se på basilikan tvärsöver.",
+      "narrative": "Sätt dig på en bänk. Du har gått ungefär fyra kilometer. Pessoa hade troligen suttit på samma bänk för hundra år sedan — han var inte stor på att gå långt, men han älskade Estrela-parken; den var hans halvvägs-punkt mellan caféerna i Chiado och hyresrummen i Campo de Ourique. Basilikan tvärs över gatan — han nämner den i tre olika dikter, alltid på avstånd, aldrig från insidan. Han kallade Lissabon för sin enda kärlek. Vi har gått igenom den nu. Spårvagn 28 stannar två kvarter härifrån om du vill hem.",
+      "images": [
+        { "source": "wikipedia", "article": "Jardim_da_Estrela", "lang": "en" }
+      ]
+    }
+  ]
+}
