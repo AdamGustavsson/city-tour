@@ -665,6 +665,10 @@ function triggerArrival() {
   const wp = App.tour.waypoints[App.activeWaypointIdx];
   if (!wp) return;
   if (App.progress.visited.includes(wp.id)) return;
+  // Only fire once per arrival — while we're still inside the radius
+  // GPS keeps ticking, but we shouldn't rebuild the modal every tick.
+  if (App.arrivedAtWpId === wp.id) return;
+  App.arrivedAtWpId = wp.id;
   if (Settings.get('vibrate', true) && navigator.vibrate) navigator.vibrate([100, 50, 100]);
   showWaypointModal(App.activeWaypointIdx, true);
 }
@@ -685,6 +689,7 @@ function markVisited(idx) {
 
 function advance() {
   closeModal();
+  App.arrivedAtWpId = null;
   const wps = App.tour.waypoints;
   if (App.activeWaypointIdx + 1 < wps.length) {
     App.activeWaypointIdx++;
@@ -748,7 +753,12 @@ async function showWaypointModal(idx, isArrival) {
         el('strong', {}, `Till nästa stopp: ${next.title}`),
         wp.walk_to_next ? el('div', {}, `${fmtDist(wp.walk_to_next.distance_m)} · ~${wp.walk_to_next.estimated_minutes} min`) : null,
         el('div', { class: 'btn-row', style: 'margin-top: 10px;' },
-          el('button', { class: 'btn secondary', onclick: () => openInMaps(next.coordinates) }, `🗺 Navigera till ${next.title}`)
+          el('button', { class: 'btn secondary', onclick: () => {
+            // Advance state BEFORE handing off to Maps so the app is
+            // already on the next waypoint when the user returns.
+            if (App.active) { markVisited(idx); advance(); }
+            openInMaps(next.coordinates);
+          }}, `🗺 Navigera till ${next.title}`)
         )
       );
     })() : null,

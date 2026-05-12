@@ -43,14 +43,21 @@ Räkna med promenadtempo **4 km/h** för `easy`, **4.5** för `moderate`, **5** 
 
 ## Trigger-radie per platstyp
 
+**Tänk såhär:** koordinaten ligger ofta i mitten av en byggnad eller plats, men användaren är typiskt utanför entrén eller på motsatt trottoar när de "är framme". Radien måste täcka den realistiska anflygningspunkten — inte avståndet till koordinatens *exakta* punkt.
+
+För byggnader: räkna `(byggnadens längsta halv-dimension) + 10–15 m buffert`. En 80 m × 30 m saluhall med koordinat i mitten kräver minst 50 m radie, annars triggar inte fronten på långsidan.
+
 | Platstyp | Radie |
 |---|---|
-| Specifik bänk, brunn, staty | 15 m |
-| Husfasad, dörr | 20 m |
-| Café, butik, museum | 25–30 m |
-| Kyrka, byggnad | 30–40 m |
-| Litet torg | 40 m |
+| Specifik bänk, brunn, staty | 15–20 m |
+| Husfasad, dörr | 25 m |
+| Café, butik, mindre museum | 25–30 m |
+| Kyrka, normal byggnad | 40–50 m |
+| Stor byggnad (saluhall, katedral, stort museum) | 50–70 m |
+| Litet torg, gränd | 40 m |
 | Stort torg | 60 m |
 | Park, vy, kaj | 60–80 m |
 
-För osäker GPS (smala gator, höga byggnader): öka 5–10 m. Användaren kan också skala upp alla radier i appens inställningar.
+**Tveka uppåt, inte nedåt.** För stor radie triggar några sekunder tidigare än optimalt — irriterande, men turen flyter. För liten triggar aldrig och bryter upplevelsen.
+
+För osäker GPS (smala gator, höga byggnader): lägg på 5–10 m. Användaren kan också skala upp alla radier i appens inställningar.

@@ -26,7 +26,7 @@
         57.7036,
         11.9609
       ],
-      "trigger_radius_m": 25,
+      "trigger_radius_m": 30,
       "short": "Här är vi. Stå med ryggen mot porten och titta västerut.",
       "narrative": "Kungsgatan löper rakt — som allt i innerstaden. När holländarna ritade upp Göteborg 1621 var det inte en estetisk fråga utan en militär: raka gator låter försvararna se hela vägen längs en kvartersrad. Du står på en av huvudaxlarna i den planen. Det här kvarteret byggdes om i flera vågor — först stenstaden på 1800-talet, sedan funkis-rivningar på 1950-talet, sedan en del återställning på 2000-talet. Sätt igång västerut längs Kungsgatan. Domkyrkan ligger två kvarter bort, du ser tornet snart.",
       "images": [
@@ -48,7 +48,7 @@
         57.7045,
         11.9653
       ],
-      "trigger_radius_m": 30,
+      "trigger_radius_m": 45,
       "short": "Tredje försöket — de två första brann.",
       "narrative": "Det här är tredje domkyrkan på samma plats. Den första brann 1721. Den andra brann 1802. Den här, från 1815, har klarat sig — kanske för att de äntligen byggde den i mer sten och mindre trä. Carl Wilhelm Carlberg ritade den, och stilen är klassicistisk — alltså medvetet avskalad, raka linjer, vita pelare, inte en gotisk kyrka som vill vara katedral. Göteborg på 1810-talet var en köpmansstad, och köpmännen ville inte ha ornament som tog plats från affärerna. Gå in om dörren är öppen. Det är ljust där inne på ett sätt som svenska kyrkor sällan är.",
       "images": [
@@ -77,7 +77,7 @@
         57.7036,
         11.9679
       ],
-      "trigger_radius_m": 25,
+      "trigger_radius_m": 55,
       "short": "Sedan 1889 — gjutjärnskonstruktion, fortfarande i drift.",
       "narrative": "Stora Saluhallen öppnade 1889. Konstruktionen i gjutjärn och glas är typiskt sent 1800-tal — samma idé som Les Halles i Paris, samma idé som Covent Garden — och den här är en av få i Sverige som faktiskt har överlevt med samma funktion i hundratrettiofem år. Det är fortfarande fisk, kött, ost, bröd, och småluncher som domineras av gamla göteborgare. Gå in en sväng. Det är inte gratis-marknadshallen för turister — det är fortfarande där folk handlar middag på torsdag eftermiddag. Räkmackorna är överprisade men ärligt nog så.",
       "images": [
@@ -100,7 +100,7 @@
         57.701,
         11.9578
       ],
-      "trigger_radius_m": 25,
+      "trigger_radius_m": 35,
       "short": "Fiskhall i kyrkstil — sedan 1874, alltid kallad körkan.",
       "narrative": "Den ser ut som en kyrka, vilket är hela poängen. När den öppnade 1874 hånlogde göteborgarna åt att de byggt en fiskhall i nygotisk stil och döpte den genast till Feskekörka — fisk-kyrkan. Namnet fastnade så pass att stadsförvaltningen gav upp och accepterade det. Arkitekten Victor von Gegerfelt ritade den inspirerad av norska stavkyrkor och engelska gotiska kapell, vilket är en udda kombination för en byggnad där det luktar fisk. Den var stängd 2020–2024 för renovering och öppnade igen som matmarknad. Står hon öppen, gå in. Lukten är inte vad den var, vilket beror på modernare köldhantering och inte på saknad av fisk.",
       "images": [
@@ -133,7 +133,7 @@
         57.6987,
         11.9552
       ],
-      "trigger_radius_m": 40,
+      "trigger_radius_m": 50,
       "short": "Göteborgs första förort — och dess första räddade kvarter.",
       "narrative": "Haga var Göteborgs första förort, anlagd 1648 utanför stadsmurarna för arbetare som inte fick bo innanför. På 1800-talet bodde här fabriksarbetare, sjömän, fattigt folk — på 1960-talet var det en av Sveriges mest nedslitna stadsdelar och planerades att rivas helt och byggas om till skivhus. Mellan 1976 och 1985 stoppades rivningen efter aktivism, och kvar finns de här låga trä- och landshövdingehusen — typiska Göteborg, två våningar trä på en våning sten, ett kompromissbygge för att kringgå brandregler på sent 1800-tal. Idag är det fullt av kaféer och butiker; den hagabo som bodde här 1955 skulle inte känna igen sig, men huset står kvar. Det är en seger som kommer av civil olydnad. Sätt dig och ta en bulle — de är stora i Haga, det är en hel grej. Vi slutar här.",
       "images": [

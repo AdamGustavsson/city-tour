@@ -119,11 +119,16 @@ Följ schemat i `references/tour-schema.json` exakt. Vanliga fallgropar:
 
 - `order` måste vara 1-indexerad och konsekutiv (1, 2, 3, ...).
 - `coordinates` är `[lat, lng]`, inte `[lng, lat]` (GeoJSON-konventionen är tvärtom — vi följer Leaflet).
-- `trigger_radius_m` är 15–80. Bedöm per plats:
-  - Specifik bänk eller staty: **15 m**
-  - Kyrka eller byggnad: **30–40 m**
-  - Litet torg: **40 m**
-  - Stort torg eller park: **60–80 m**
+- `trigger_radius_m` är 15–80. **Resonera så här:** koordinaten ligger ofta i mitten av en byggnad eller plats, men användaren befinner sig typiskt utanför entrén eller på motsatt trottoar när de "är framme". Radien måste täcka den realistiska *anflygningspunkten* — annars triggar appen aldrig och användaren tror att den är trasig.
+  - Tumregel för byggnader: `(byggnadens längsta halv-dimension) + 10–15 m buffert`.
+  - Specifik bänk, brunn eller staty: **15–20 m** (här står användaren rakt på koordinaten).
+  - Liten butik, café, dörr: **25–30 m**.
+  - Kyrka eller normal byggnad: **40–50 m**.
+  - Stor byggnad (saluhall, katedral, museum med fasad mot flera gator): **50–70 m**.
+  - Litet torg där användaren rör sig in: **40 m**.
+  - Stort torg, park eller utsiktsplats: **60–80 m**.
+  - **Tveka uppåt, inte nedåt.** En för stor radie triggar några sekunder tidigare än optimalt — irriterande, men turen flyter. En för liten triggar aldrig och bryter hela upplevelsen.
+  - Bergsiga eller smala gränder med dålig GPS: lägg på **5–10 m**.
 - Hitta aldrig på URL:er. Använd `images: [{ source: "wikipedia", article: "<slug>", lang: "en" }]` eller `{ source: "search_query", query: "..." }` istället.
 - Wikipedia-slugs är artikelnamnet med understreck (`A_Brasileira`, inte `A Brasileira`).
 
