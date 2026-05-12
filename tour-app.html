@@ -825,13 +825,16 @@ async function playTTS(text, lang) {
 
   try {
     let res;
+    // 45 s safety timeout so the button can't hang on "Hämtar röst" forever.
+    const timeoutId = setTimeout(() => ac.abort('timeout'), 45000);
     if (provider === 'openai') {
       const voice = Settings.get('openai_voice', 'alloy');
-      const model = Settings.get('openai_model', 'gpt-4o-mini-tts');
+      const model = Settings.get('openai_model', 'tts-1-hd');
       const speed = clamp(Number(Settings.get('openai_speed', 1.0)) || 1.0, 0.25, 4.0);
       const body = { model, voice, input: text, speed };
       // gpt-4o-mini-tts supports a free-text 'instructions' field that
-      // steers tone/pacing — significantly improves narration quality.
+      // steers tone/pacing. Note: in practice this model can drop the
+      // tail of the input and occasionally returns no audio at all.
       if (model === 'gpt-4o-mini-tts') {
         body.instructions = Settings.get('openai_instructions',
           'Speak in a warm, calm, conversational tour-guide voice. Unhurried pacing, with slight pauses between sentences. Pronounce foreign place names naturally in their local language.');
@@ -849,6 +852,7 @@ async function playTTS(text, lang) {
         body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2' })
       });
     }
+    clearTimeout(timeoutId);
     if (ac.signal.aborted) return;
     if (!res.ok) {
       snackbar(`${provider} TTS misslyckades — kontrollera nyckel`);
@@ -856,6 +860,10 @@ async function playTTS(text, lang) {
     }
     const blob = await res.blob();
     if (ac.signal.aborted) return;
+    if (!blob || blob.size < 200) {
+      snackbar(`${provider} returnerade tom audio — använder Web Speech`);
+      return webSpeech(text, lang);
+    }
     const audio = new Audio(URL.createObjectURL(blob));
     audio.addEventListener('ended', () => { if (App.ttsAudio === audio) setTTSButton('idle'); });
     audio.addEventListener('pause', () => {
@@ -866,10 +874,16 @@ async function playTTS(text, lang) {
     App.ttsPlaying = true;
     await audio.play();
   } catch (e) {
+    if (ac.signal.reason === 'timeout') {
+      snackbar(`${provider} TTS svarade inte på 45 s — använder Web Speech`);
+      webSpeech(text, lang);
+      return;
+    }
     if (e.name === 'AbortError') return;
     snackbar(`${provider} TTS-fel — använder Web Speech`);
     webSpeech(text, lang);
   } finally {
+    clearTimeout(timeoutId);
     if (App.ttsAbort === ac) App.ttsAbort = null;
   }
 }
@@ -991,11 +1005,11 @@ function renderSettings() {
   root.appendChild(openaiInput);
 
   const modelSel = el('select', {},
-    el('option', { value: 'gpt-4o-mini-tts' }, 'gpt-4o-mini-tts (bäst, stöder instruktioner)'),
-    el('option', { value: 'tts-1-hd' }, 'tts-1-hd (hög kvalitet)'),
+    el('option', { value: 'tts-1-hd' }, 'tts-1-hd (hög kvalitet, pålitlig) — rekommenderad'),
     el('option', { value: 'tts-1' }, 'tts-1 (snabbast, lägre kvalitet)'),
+    el('option', { value: 'gpt-4o-mini-tts' }, 'gpt-4o-mini-tts (experimentell — kan tappa innehåll och hänga)'),
   );
-  modelSel.value = s.openai_model || 'gpt-4o-mini-tts';
+  modelSel.value = s.openai_model || 'tts-1-hd';
   modelSel.addEventListener('change', () => Settings.set('openai_model', modelSel.value));
   root.appendChild(el('label', {}, 'OpenAI modell')); root.appendChild(modelSel);
 
