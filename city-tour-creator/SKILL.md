@@ -67,7 +67,7 @@ Skillen inkluderar tre Python-script under `scripts/` som du **ska köra mot din
 |---|---|---|
 | `scripts/validate_tour.py <fil>` | Strukturvalidering (schema, order, koord-intervall, radien 15–80 m, narrative-längd, https-länkar). Bör alltid passera. | Nej |
 | `scripts/compute_distances.py <fil>` | Räknar haversine mellan dina koordinater, jämför mot `walk_to_next.distance_m` och totalsumman. Flaggar avstånd som är kortare än fågelvägen (omöjligt) eller > 2x fågelvägen (troligen fel koord). | Nej |
-| `scripts/verify_coordinates.py <fil>` | Slår upp varje waypoint i Nominatim och rapporterar drift mot din inlagda koordinat. > 100 m = varning, > 500 m = nästan säkert fel. | Ja (Nominatim) |
+| `scripts/verify_coordinates.py <fil>` | Multi-källa: (1) Nominatim-drift, (2) Wikipedia-koordinat från waypointens `images.article`-slug, (3) kluster-outlier-check mot centroiden, (4) OSM-klass/typ för felmatchade features (t.ex. en kyrka som returnerar `highway:residential` = matchade gatan, inte byggnaden). Två oberoende källor inom 50 m = bekräftad. | Ja (Nominatim + Wikipedia) |
 
 **Workflow:**
 

@@ -1,23 +1,38 @@
 #!/usr/bin/env python3
 """
-verify_coordinates.py — verifiera waypoint-koordinater mot OpenStreetMaps
-Nominatim API (gratis, ingen nyckel).
+verify_coordinates.py — multi-source coordinate verification for tour.json.
 
-För varje waypoint:
-- Slå upp "<title>, <city>" (eller "<title>, <city>, <country>") i Nominatim.
-- Räkna avståndet mellan inlagd koordinat och det Nominatim returnerar.
-- Flagga avstånd > 100 m som varning, > 500 m som troligt fel.
+For each waypoint, runs four checks and reports per-check results:
 
-OBS: kräver internet. Nominatim har en användarpolicy (max 1 req/s,
-identifierande User-Agent). Skriptet respekterar detta.
+  1. Nominatim search:  "<title>, <city>"  → expect drift < 100m.
+  2. Wikipedia coords:  if the waypoint has a wikipedia image source,
+                        fetch the article summary and compare coords.
+  3. Cluster bbox:      every waypoint must be within a sane distance
+                        of the cluster centroid (catches gross outliers
+                        like "wrong city").
+  4. OSM class/type:    print what kind of feature Nominatim returned
+                        so the agent can spot mismatches (e.g. a church
+                        waypoint returning `class=highway`).
 
-Användning:
+Two confirming sources (Nominatim + Wikipedia) within 50m is the gold
+standard; flag and re-check anything else.
+
+Exit 0 if no likely errors. Exit 1 if errors found.
+
+Usage:
     python3 verify_coordinates.py path/to/tour.json
 """
 import json, math, sys, time, urllib.parse, urllib.request
 
 NOMINATIM = "https://nominatim.openstreetmap.org/search"
-USER_AGENT = "city-tour-creator/1.0 (skill verification script)"
+WIKI_SUMMARY = "https://{lang}.wikipedia.org/api/rest_v1/page/summary/{slug}"
+UA = "city-tour-creator/1.0 (skill verification)"
+
+# Distance thresholds (meters)
+DRIFT_WARN = 100
+DRIFT_ERR = 500
+CROSS_SOURCE_OK = 50           # Nominatim+Wikipedia agree within this -> green
+CLUSTER_OUTLIER_FACTOR = 3.0   # > this * median distance from centroid -> outlier
 
 
 def haversine(a, b):
@@ -29,16 +44,56 @@ def haversine(a, b):
     return 2 * R * math.asin(math.sqrt(h))
 
 
-def nominatim_search(query):
-    params = urllib.parse.urlencode({"q": query, "format": "json", "limit": 1})
-    req = urllib.request.Request(f"{NOMINATIM}?{params}",
-                                 headers={"User-Agent": USER_AGENT,
-                                          "Accept-Language": "en"})
+def http_json(url, headers=None):
+    req = urllib.request.Request(url, headers={"User-Agent": UA, **(headers or {})})
     with urllib.request.urlopen(req, timeout=15) as r:
-        data = json.loads(r.read())
+        return json.loads(r.read())
+
+
+def nominatim_search(query):
+    params = urllib.parse.urlencode({"q": query, "format": "json", "limit": 1,
+                                     "addressdetails": 1})
+    data = http_json(f"{NOMINATIM}?{params}", {"Accept-Language": "en"})
     if not data:
         return None
-    return (float(data[0]["lat"]), float(data[0]["lon"]), data[0].get("display_name", ""))
+    d = data[0]
+    return {
+        "coord": (float(d["lat"]), float(d["lon"])),
+        "class": d.get("class"),
+        "type": d.get("type"),
+        "name": d.get("display_name", ""),
+    }
+
+
+def wikipedia_coord(slug, lang):
+    try:
+        url = WIKI_SUMMARY.format(lang=lang, slug=urllib.parse.quote(slug))
+        data = http_json(url)
+    except Exception:
+        return None
+    c = data.get("coordinates") or {}
+    if "lat" in c and "lon" in c:
+        return (float(c["lat"]), float(c["lon"]))
+    return None
+
+
+def cluster_check(waypoints):
+    """Return dict id -> distance from cluster centroid, plus median."""
+    coords = [w["coordinates"] for w in waypoints]
+    cx = sum(c[0] for c in coords) / len(coords)
+    cy = sum(c[1] for c in coords) / len(coords)
+    distances = {}
+    for w in waypoints:
+        distances[w["id"]] = haversine(w["coordinates"], [cx, cy])
+    sorted_d = sorted(distances.values())
+    median = sorted_d[len(sorted_d) // 2]
+    return distances, median
+
+
+def fmt_class(r):
+    if not r:
+        return ""
+    return f"{r['class']}:{r['type']}" if r.get("class") else ""
 
 
 def main():
@@ -48,41 +103,91 @@ def main():
     with open(sys.argv[1], encoding="utf-8") as f:
         data = json.load(f)
 
-    city = data["tour"].get("city", "")
-    country = data["tour"].get("country", "")
+    tour = data["tour"]
+    city = tour.get("city", "")
+    country = tour.get("country", "")
     suffix = f", {city}" + (f", {country}" if country else "")
 
-    print(f"Verifying against Nominatim — city: {city!r}\n")
-    n_warn = 0
-    n_err = 0
-    for w in data["waypoints"]:
-        query = w["title"] + suffix
-        try:
-            result = nominatim_search(query)
-        except Exception as e:
-            print(f"  {w['order']:>2}. {w['title']:40}  FETCH ERROR: {e}")
-            time.sleep(1.1); continue
-        if not result:
-            print(f"  {w['order']:>2}. {w['title']:40}  NOT FOUND in Nominatim — verify manually")
-            n_warn += 1
-        else:
-            lat, lng, name = result
-            d = haversine(w["coordinates"], [lat, lng])
-            flag = ""
-            if d > 500:
-                flag = "ERROR — likely wrong coord"; n_err += 1
-            elif d > 100:
-                flag = "WARN — drift > 100m"; n_warn += 1
-            print(f"  {w['order']:>2}. {w['title']:40}  drift={int(d)}m  {flag}")
-            if flag:
-                print(f"        you: {w['coordinates']}")
-                print(f"        osm: [{lat:.4f}, {lng:.4f}]  ({name[:80]})")
-        time.sleep(1.1)  # Nominatim: max 1 req/s
+    waypoints = data["waypoints"]
+    cluster_dist, median_dist = cluster_check(waypoints)
+    outlier_threshold = max(median_dist * CLUSTER_OUTLIER_FACTOR, 1000)
 
-    print()
+    print(f"Tour: {tour.get('title')!r}  ({city})\n")
+    print(f"{'#':>2}  {'Title':40}  {'Nominatim':>10}  {'Wikipedia':>10}  {'Cluster':>9}  OSM class")
+    print("-" * 110)
+
+    n_err = 0
+    n_warn = 0
+
+    for w in waypoints:
+        title = w["title"]
+        coord = w["coordinates"]
+
+        # 1. Nominatim
+        try:
+            nom = nominatim_search(title + suffix)
+            time.sleep(1.1)
+        except Exception as e:
+            nom = None
+            print(f"  Nominatim fetch error for {title!r}: {e}", file=sys.stderr)
+        nom_drift_str = "—"
+        nom_drift = None
+        if nom:
+            nom_drift = haversine(coord, nom["coord"])
+            nom_drift_str = f"{int(nom_drift)}m"
+
+        # 2. Wikipedia (if waypoint has a wikipedia image source)
+        wiki_drift = None
+        wiki_drift_str = "—"
+        for img in w.get("images") or []:
+            if img.get("source") == "wikipedia":
+                wc = wikipedia_coord(img["article"], img.get("lang", "en"))
+                if wc:
+                    wiki_drift = haversine(coord, wc)
+                    wiki_drift_str = f"{int(wiki_drift)}m"
+                    break
+
+        # 3. Cluster
+        cdist = cluster_dist[w["id"]]
+        cluster_str = f"{int(cdist)}m"
+        cluster_outlier = cdist > outlier_threshold
+
+        # 4. OSM class
+        cls = fmt_class(nom)
+
+        # Decide flag
+        flag = ""
+        # Two sources agree closely → strong green
+        if nom_drift is not None and wiki_drift is not None:
+            if max(nom_drift, wiki_drift) < CROSS_SOURCE_OK:
+                flag = "✓ confirmed"
+            elif abs(nom_drift - wiki_drift) > 200 and min(nom_drift, wiki_drift) < 50:
+                # One source agrees, one disagrees — Nominatim may have matched wrong feature
+                flag = "OK (one source)"
+        # Errors
+        if (nom_drift is not None and nom_drift > DRIFT_ERR) and (wiki_drift is None or wiki_drift > DRIFT_ERR):
+            flag = "ERROR — coord likely wrong"; n_err += 1
+        elif cluster_outlier:
+            flag = f"ERROR — cluster outlier ({int(cdist)}m vs median {int(median_dist)}m)"; n_err += 1
+        elif (nom_drift is not None and nom_drift > DRIFT_WARN) and (wiki_drift is None or wiki_drift > DRIFT_WARN):
+            flag = "WARN — drift > 100m, verify"; n_warn += 1
+
+        print(f"  {w['order']:>2}  {title[:40]:40}  {nom_drift_str:>10}  {wiki_drift_str:>10}  {cluster_str:>9}  {cls:25} {flag}")
+
+    print("-" * 110)
+    print(f"Cluster: median dist from centroid = {int(median_dist)}m, "
+          f"outlier threshold = {int(outlier_threshold)}m")
     print(f"Result: {n_err} likely error(s), {n_warn} warning(s).")
-    print("Note: Nominatim is OSM — not always perfect, especially for small places.")
-    print("Drift > 500m almost always means a wrong coord; investigate manually.")
+    print()
+    print("Reading the columns:")
+    print("  Nominatim/Wikipedia drift: distance from your coord to that source's coord.")
+    print("  Both < 50m   => coordinate is confirmed by two independent sources.")
+    print("  One source   => acceptable but eyeball it on a map.")
+    print("  Cluster      => distance from the centroid of all waypoints; outliers")
+    print("                  usually mean a coord landed in the wrong neighbourhood.")
+    print("  OSM class    => what kind of feature Nominatim matched. A church waypoint")
+    print("                  returning `highway:residential` means it matched a street,")
+    print("                  not the building — investigate.")
     sys.exit(1 if n_err else 0)
 
 
