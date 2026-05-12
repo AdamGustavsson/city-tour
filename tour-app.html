@@ -672,6 +672,9 @@ async function showWaypointModal(idx, isArrival) {
       el('button', { class: 'close', onclick: () => closeModal() }, '✕')
     ),
     imagesDiv,
+    el('div', { class: 'btn-row', style: 'margin: 4px 0 12px;' },
+      el('button', { class: 'btn', id: 'tts-btn', style: 'flex:1;', onclick: () => onTTSClick(wp.narrative, t.language) }, '🔊 Läs upp')
+    ),
     el('div', { class: 'narrative' }, wp.narrative),
     wp.trivia && wp.trivia.length ? el('div', { class: 'trivia' },
       el('strong', {}, 'Visste du:'),
@@ -690,7 +693,6 @@ async function showWaypointModal(idx, isArrival) {
     })() : null,
     linksDiv,
     el('div', { class: 'btn-row' },
-      el('button', { class: 'btn secondary', id: 'tts-btn', onclick: () => onTTSClick(wp.narrative, t.language) }, '🔊 Läs upp'),
       el('button', { class: 'btn secondary', onclick: () => openInMaps(wp.coordinates) }, `🗺 Hitta hit (${wp.title})`)
     ),
     el('label', {}, 'Anteckning'),
@@ -704,13 +706,10 @@ async function showWaypointModal(idx, isArrival) {
   loadWaypointImages(wp, t, imagesDiv);
   renderLinks(wp.links || [], linksDiv);
 
-  // Auto-play TTS on arrival if enabled. Use a short delay so the
-  // modal animates in and the button is in the DOM before we set state.
-  if (isArrival && Settings.get('autoplay', true)) {
-    setTimeout(() => playTTS(wp.narrative, t.language), 400);
-  } else {
-    setTTSButton('idle');
-  }
+  // No auto-play on arrival: iOS blocks audio playback without an
+  // active user gesture, so we always require a tap. The play button
+  // is rendered prominently at the top of the modal to make this fast.
+  setTTSButton('idle');
 }
 
 async function loadWaypointImages(wp, tour, container) {
@@ -1083,7 +1082,7 @@ function renderSettings() {
   radInput.addEventListener('change', () => Settings.set('radius_multiplier', parseFloat(radInput.value)));
   root.appendChild(radInput);
 
-  for (const [key, label, def] of [['autoplay','Auto-spela röst vid framme', true],['vibrate','Vibrera vid framme', true],['wake_lock','Håll skärm på under tur', true]]) {
+  for (const [key, label, def] of [['vibrate','Vibrera vid framme', true],['wake_lock','Håll skärm på under tur', true]]) {
     const cb = el('input', { type: 'checkbox' });
     cb.checked = s[key] !== undefined ? s[key] : def;
     cb.addEventListener('change', () => Settings.set(key, cb.checked));
