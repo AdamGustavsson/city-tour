@@ -208,6 +208,7 @@ function el(tag, attrs = {}, ...children) {
   }
   return e;
 }
+function clamp(x, lo, hi) { return Math.min(hi, Math.max(lo, x)); }
 function haversine(a, b) {
   const R = 6371000;
   const toRad = d => d * Math.PI / 180;
@@ -824,7 +825,8 @@ async function playTTS(text, lang) {
     if (provider === 'openai') {
       const voice = Settings.get('openai_voice', 'alloy');
       const model = Settings.get('openai_model', 'gpt-4o-mini-tts');
-      const body = { model, voice, input: text };
+      const speed = clamp(Number(Settings.get('openai_speed', 1.0)) || 1.0, 0.25, 4.0);
+      const body = { model, voice, input: text, speed };
       // gpt-4o-mini-tts supports a free-text 'instructions' field that
       // steers tone/pacing — significantly improves narration quality.
       if (model === 'gpt-4o-mini-tts') {
@@ -998,6 +1000,16 @@ function renderSettings() {
   voiceSel.value = s.openai_voice || 'alloy';
   voiceSel.addEventListener('change', () => Settings.set('openai_voice', voiceSel.value));
   root.appendChild(el('label', {}, 'OpenAI röst')); root.appendChild(voiceSel);
+
+  const speedInput = el('input', { type: 'number', min: '0.25', max: '4', step: '0.05' });
+  speedInput.value = s.openai_speed ?? 1.0;
+  speedInput.addEventListener('change', () => {
+    const v = clamp(parseFloat(speedInput.value) || 1.0, 0.25, 4.0);
+    speedInput.value = v;
+    Settings.set('openai_speed', v);
+  });
+  root.appendChild(el('label', {}, 'OpenAI uppläsningshastighet (0.25–4.0, default 1.0)'));
+  root.appendChild(speedInput);
 
   const instrInput = el('textarea', { placeholder: 'Beskriv ton, tempo, känsla... (endast gpt-4o-mini-tts)' });
   instrInput.value = s.openai_instructions || 'Speak in a warm, calm, conversational tour-guide voice. Unhurried pacing, with slight pauses between sentences. Pronounce foreign place names naturally in their local language.';
