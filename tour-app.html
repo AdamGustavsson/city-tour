@@ -823,10 +823,18 @@ async function playTTS(text, lang) {
     let res;
     if (provider === 'openai') {
       const voice = Settings.get('openai_voice', 'alloy');
+      const model = Settings.get('openai_model', 'gpt-4o-mini-tts');
+      const body = { model, voice, input: text };
+      // gpt-4o-mini-tts supports a free-text 'instructions' field that
+      // steers tone/pacing — significantly improves narration quality.
+      if (model === 'gpt-4o-mini-tts') {
+        body.instructions = Settings.get('openai_instructions',
+          'Speak in a warm, calm, conversational tour-guide voice. Unhurried pacing, with slight pauses between sentences. Pronounce foreign place names naturally in their local language.');
+      }
       res = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST', signal: ac.signal,
         headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'tts-1', voice, input: text })
+        body: JSON.stringify(body)
       });
     } else if (provider === 'elevenlabs') {
       const voiceId = Settings.get('elevenlabs_voice', '21m00Tcm4TlvDq8ikWAM');
@@ -977,10 +985,24 @@ function renderSettings() {
   });
   root.appendChild(openaiInput);
 
-  const voiceSel = el('select', {}, ...['alloy','echo','fable','onyx','nova','shimmer'].map(v => el('option', { value: v }, v)));
+  const modelSel = el('select', {},
+    el('option', { value: 'gpt-4o-mini-tts' }, 'gpt-4o-mini-tts (bäst, stöder instruktioner)'),
+    el('option', { value: 'tts-1-hd' }, 'tts-1-hd (hög kvalitet)'),
+    el('option', { value: 'tts-1' }, 'tts-1 (snabbast, lägre kvalitet)'),
+  );
+  modelSel.value = s.openai_model || 'gpt-4o-mini-tts';
+  modelSel.addEventListener('change', () => Settings.set('openai_model', modelSel.value));
+  root.appendChild(el('label', {}, 'OpenAI modell')); root.appendChild(modelSel);
+
+  const voiceSel = el('select', {}, ...['alloy','ash','ballad','coral','echo','fable','onyx','nova','sage','shimmer','verse'].map(v => el('option', { value: v }, v)));
   voiceSel.value = s.openai_voice || 'alloy';
   voiceSel.addEventListener('change', () => Settings.set('openai_voice', voiceSel.value));
   root.appendChild(el('label', {}, 'OpenAI röst')); root.appendChild(voiceSel);
+
+  const instrInput = el('textarea', { placeholder: 'Beskriv ton, tempo, känsla... (endast gpt-4o-mini-tts)' });
+  instrInput.value = s.openai_instructions || 'Speak in a warm, calm, conversational tour-guide voice. Unhurried pacing, with slight pauses between sentences. Pronounce foreign place names naturally in their local language.';
+  instrInput.addEventListener('change', () => Settings.set('openai_instructions', instrInput.value));
+  root.appendChild(el('label', {}, 'OpenAI röstinstruktioner')); root.appendChild(instrInput);
 
   root.appendChild(el('label', {}, 'ElevenLabs API-nyckel'));
   const elInput = el('input', { type: 'password', placeholder: 'xi-...' });
