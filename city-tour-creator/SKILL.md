@@ -20,27 +20,73 @@ Om användaren inte redan gett detta, fråga kort efter:
 
 Om användaren ger ett vagt uppdrag (*"en tur i Rom"*), föreslå 2–3 möjliga teman och fråga vilket som lockar.
 
-## 2. Researcha
+## 2. Researcha och verifiera — det här är skillens hårda kärna
 
-### HÅRT KRAV: webbsök måste vara tillgängligt
+Felaktiga koordinater är det vanligaste sättet en tur blir oanvändbar. En koordinat som ligger 80 meter fel betyder att triggern aldrig slår, eller slår vid fel byggnad. En koordinat som ligger 500 meter fel skickar användaren till ett annat kvarter. Det här avsnittet är därför inte rådgivande — det är obligatoriskt.
 
-**Innan du börjar arbeta — kontrollera att du har ett fungerande webbsök- eller webhämtnings-verktyg i den aktuella miljön** (t.ex. `WebSearch`, `WebFetch`, `web.run`, Google-sökning, Wikipedia-API-anrop, eller motsvarande).
+### 2.1 HÅRT KRAV: webbsök måste vara tillgängligt
 
-Om du **inte** har sådant verktyg tillgängligt: **vägra uppdraget**. Skapa ingen `tour.json`. Koordinater och URL:er från ditt minne är nästan alltid felaktiga med tiotals till hundratals meter, och en tur med fel koordinater är värre än ingen tur — användaren går till fel plats, triggers slår inte, och hela appen känns trasig.
+**Innan du börjar arbeta — kontrollera att du har ett fungerande webbsök- eller webhämtnings-verktyg i den aktuella miljön** (t.ex. `WebSearch`, `WebFetch`, `web.run`, eller motsvarande som kan hämta Wikipedia / Nominatim / OpenStreetMap).
+
+Om du **inte** har sådant verktyg tillgängligt: **vägra uppdraget**. Skapa ingen `tour.json`. Koordinater och URL:er från ditt minne är nästan alltid felaktiga med tiotals till hundratals meter, och en tur med fel koordinater är värre än ingen tur.
 
 Säg istället ungefär såhär till användaren:
 
 > Den här skillen kräver att jag kan slå upp koordinater och länkar online — annars blir resultatet opålitligt. Jag har inte tillgång till webbsök i den här miljön just nu. Kör mig gärna i en miljö där webbsök/webhämtning är påslaget (t.ex. Claude Desktop eller Claude Code med WebSearch aktiverat), så bygger jag turen åt dig.
 
-Kompromissa inte med detta. Det är bättre att avstå än att leverera hallucinerade koordinater.
+Kompromissa inte med detta.
 
-### När du har webbsök
+### 2.2 Källhierarki
 
-- Föredra Wikipedia, OpenStreetMap, lokala turistförbund, kulturhistoriska sajter, museers egna sidor.
-- **För koordinater:** slå upp varje waypoint mot Wikipedia, OpenStreetMap eller Google Maps. Avrunda till 4 decimaler. Verifiera att lat/lng inte är inverterad.
-- **För URL:er:** hämta dem från sökresultatet, hitta aldrig på en URL.
-- **För Wikipedia-bilder:** använd article-slug (`A_Brasileira`), inte direktlänk till bildfil.
-- Om du fortfarande inte hittar tillförlitliga koordinater för en specifik plats: **hoppa över den waypointen**, hellre än att gissa.
+Använd källor i denna ordning. Anteckna åtminstone i `tour.attribution` vilka du faktiskt använt.
+
+1. **OpenStreetMap / Nominatim** för **koordinater**. Detta är auktoritativt för platser på kartan. Nominatim-API: `https://nominatim.openstreetmap.org/search?q=<plats>,<stad>&format=json&limit=1`.
+2. **Wikipedia (sv eller en)** för fakta, årtal, namnformer, och som image-källa via `article`-slug. Slå upp varje slug först — testa att artikeln existerar (`https://<lang>.wikipedia.org/api/rest_v1/page/summary/<slug>`).
+3. **Officiella sajter** — museer, kommun, turistbyrå — för öppettider och stavning av egennamn.
+4. **Egna minnen och gissningar:** aldrig. Om du inte kan bekräfta något, skriv det inte eller hoppa över waypointen.
+
+### 2.3 Konkret procedur per waypoint
+
+Gör detta för **varje** waypoint innan du skriver narrativen:
+
+1. **Bekräfta platsens existens och officiella namn** via Wikipedia eller officiell sajt.
+2. **Hämta koordinaten från en auktoritativ källa**:
+   - Wikipedias infobox (`coordinates` i artikeln), eller
+   - Nominatim-sökning `"<plats>, <stad>, <land>"`, eller
+   - OSM-objektets `geo:lat`, `geo:lon`.
+   - Avrunda till **4 decimaler** (≈ 11 m precision). Verifiera att du inte bytt plats på lat/lng (i Sverige är lat ≈ 55–69, lng ≈ 11–24; i Sydeuropa lng är ofta negativ — t.ex. Lissabon –9).
+3. **Verifiera fakta i narrativen** mot Wikipedia eller annan källa. Datum, namn, antal — varje sådan uppgift bör vara hämtad, inte mints.
+4. **Plocka image-slug:en** direkt från Wikipedia-URLen (delen efter `/wiki/`). Använd alltid `_` istället för mellanslag och URL-encoda specialtecken (`%C3%A9` för `é`).
+5. **Räkna avstånd till nästa waypoint** med haversine-formeln på de verifierade koordinaterna (eller använd `scripts/compute_distances.py` på din draft). Sätt `walk_to_next.distance_m` till ~1.2x fågelvägen för en realistisk gångväg, mer i bergiga eller krångliga kvarter.
+
+### 2.4 Verktyg som följer med skillen
+
+Skillen inkluderar tre Python-script under `scripts/` som du **ska köra mot din `tour.json` innan leverans**. Alla använder bara Python stdlib — inga `pip install`:
+
+| Script | Syfte | Kräver internet |
+|---|---|---|
+| `scripts/validate_tour.py <fil>` | Strukturvalidering (schema, order, koord-intervall, radien 15–80 m, narrative-längd, https-länkar). Bör alltid passera. | Nej |
+| `scripts/compute_distances.py <fil>` | Räknar haversine mellan dina koordinater, jämför mot `walk_to_next.distance_m` och totalsumman. Flaggar avstånd som är kortare än fågelvägen (omöjligt) eller > 2x fågelvägen (troligen fel koord). | Nej |
+| `scripts/verify_coordinates.py <fil>` | Slår upp varje waypoint i Nominatim och rapporterar drift mot din inlagda koordinat. > 100 m = varning, > 500 m = nästan säkert fel. | Ja (Nominatim) |
+
+**Workflow:**
+
+```
+# 1. Du har skrivit tour.json
+python3 scripts/validate_tour.py tour-min-tur.json
+# 2. Strukturen ok — kontrollera geometrin
+python3 scripts/compute_distances.py tour-min-tur.json
+# 3. Slutligen verifiera koordinater mot OSM
+python3 scripts/verify_coordinates.py tour-min-tur.json
+```
+
+Om `verify_coordinates.py` rapporterar fel: **rätta koordinaten innan leverans**. Om Nominatim inte hittar en plats men du har en stark Wikipedia-koordinat — det är ok, men anteckna i `tour.attribution`.
+
+Om Python inte är tillgängligt i miljön: gör samma kontroller manuellt. Räkna åtminstone haversine på två-tre slumpvalda waypoint-par för att fånga ordersfel och inverterade lat/lng.
+
+### 2.5 Om du fortfarande inte kan verifiera en specifik plats
+
+Hoppa över waypointen, eller markera den som `optional: true` och var explicit i narrativen att den är osäker. Aldrig leverera en koordinat du gissat på.
 
 ## 3. Planera rutten geografiskt
 
@@ -81,17 +127,28 @@ Följ schemat i `references/tour-schema.json` exakt. Vanliga fallgropar:
 - Hitta aldrig på URL:er. Använd `images: [{ source: "wikipedia", article: "<slug>", lang: "en" }]` eller `{ source: "search_query", query: "..." }` istället.
 - Wikipedia-slugs är artikelnamnet med understreck (`A_Brasileira`, inte `A Brasileira`).
 
-## 6. Validera
+## 6. Validera — kör alla tre scripten
 
-Innan leverans, kontrollera:
+Innan leverans, kör i ordning:
 
-- JSON är giltig (parsa det själv).
-- `schema_version: "1.0"` finns.
+```
+python3 scripts/validate_tour.py    <fil>   # struktur
+python3 scripts/compute_distances.py <fil>  # geometri
+python3 scripts/verify_coordinates.py <fil> # vs Nominatim
+```
+
+Alla tre måste sluta utan errors. Varningar (drift 100–500 m, ovanliga avstånd) ska du gå igenom manuellt och åtgärda eller motivera.
+
+Om scripten inte kan köras i din miljö, gör motsvarande kontroller för hand:
+
+- JSON parsar utan fel.
+- `schema_version: "1.0"`.
 - `waypoints.length >= 3`.
-- Alla `coordinates` är inom giltigt intervall (lat ±90, lng ±180).
+- Alla `coordinates` inom giltigt intervall.
 - `order` 1-indexerad och konsekutiv.
-- Räkna total `distance_km` genom att summera `walk_to_next.distance_m` och dividera med 1000.
-- `duration_minutes` ≈ promenadtid + uppläsningstid + lite spilltid.
+- Total `distance_km` ≈ summa av `walk_to_next.distance_m / 1000`.
+- `duration_minutes` ≈ promenadtid + uppläsningstid + spilltid.
+- Två stickprov: räkna haversine för hand mellan första-andra och mitten-mitten+1, jämför mot dina `walk_to_next.distance_m`.
 
 ## 7. Leverera
 

@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.0",
+  "tour": {
+    "id": "goteborg-kungsgatan-45min",
+    "title": "Från Kungsgatan till Haga — kort runda",
+    "city": "Göteborg",
+    "country": "SE",
+    "language": "sv",
+    "theme": "Stadshistoria och kvarterskaraktär",
+    "duration_minutes": 45,
+    "distance_km": 2.0,
+    "difficulty": "easy",
+    "start_coordinates": [57.7045, 11.9665],
+    "intro_narrative": "Vi startar precis där du står — på Kungsgatan, mitt i det Göteborg som nederländarna ritade upp 1621. Stadens grundplan är holländsk, gatorna är raka, och kanalerna är inte romantiska — de var fästningens vallgrav. På fyrtiofem minuter går vi från Kungsgatans rygg genom domkyrkokvarteren, ner till Stora Saluhallen, vidare till Feskekörka, och slutar i Haga. Korta avstånd, jämn mark, ett par bra kaffemöjligheter på vägen.",
+    "outro_narrative": "Du står nu i Haga — Göteborgs första förort, sedan slum, sedan rivningshotad, sedan räddad på 1980-talet. Spårvagn 1, 3 och 6 går från Järntorget en kort bit söderut. Tack för sällskapet."
+  },
+  "waypoints": [
+    {
+      "id": "wp-01",
+      "order": 1,
+      "title": "Kungsgatan 20 — startpunkt",
+      "coordinates": [57.7045, 11.9665],
+      "trigger_radius_m": 25,
+      "short": "Här är vi. Stå med ryggen mot porten och titta västerut.",
+      "narrative": "Kungsgatan löper rakt — som allt i innerstaden. När holländarna ritade upp Göteborg 1621 var det inte en estetisk fråga utan en militär: raka gator låter försvararna se hela vägen längs en kvartersrad. Du står på en av huvudaxlarna i den planen. Det här kvarteret byggdes om i flera vågor — först stenstaden på 1800-talet, sedan funkis-rivningar på 1950-talet, sedan en del återställning på 2000-talet. Sätt igång västerut längs Kungsgatan. Domkyrkan ligger två kvarter bort, du ser tornet snart.",
+      "images": [
+        { "source": "search_query", "query": "Kungsgatan Göteborg stenstad" }
+      ],
+      "walk_to_next": {
+        "distance_m": 220,
+        "estimated_minutes": 3,
+        "directions_hint": "Västerut längs Kungsgatan, sedan höger in på Västra Hamngatan — du ser domkyrkans torn över taken."
+      }
+    },
+    {
+      "id": "wp-02",
+      "order": 2,
+      "title": "Göteborgs domkyrka",
+      "coordinates": [57.7048, 11.9638],
+      "trigger_radius_m": 30,
+      "short": "Tredje försöket — de två första brann.",
+      "narrative": "Det här är tredje domkyrkan på samma plats. Den första brann 1721. Den andra brann 1802. Den här, från 1815, har klarat sig — kanske för att de äntligen byggde den i mer sten och mindre trä. Carl Wilhelm Carlberg ritade den, och stilen är klassicistisk — alltså medvetet avskalad, raka linjer, vita pelare, inte en gotisk kyrka som vill vara katedral. Göteborg på 1810-talet var en köpmansstad, och köpmännen ville inte ha ornament som tog plats från affärerna. Gå in om dörren är öppen. Det är ljust där inne på ett sätt som svenska kyrkor sällan är.",
+      "images": [
+        { "source": "wikipedia", "article": "G%C3%B6teborgs_domkyrka", "lang": "sv" }
+      ],
+      "links": [
+        { "label": "Wikipedia", "url": "https://sv.wikipedia.org/wiki/G%C3%B6teborgs_domkyrka" }
+      ],
+      "walk_to_next": {
+        "distance_m": 350,
+        "estimated_minutes": 5,
+        "directions_hint": "Söderut längs Västra Hamngatan, över Vallgraven via Rosenlundsbron — du ser saluhallen på vänster sida när du kommit över."
+      }
+    },
+    {
+      "id": "wp-03",
+      "order": 3,
+      "title": "Stora Saluhallen",
+      "coordinates": [57.7035, 11.9648],
+      "trigger_radius_m": 25,
+      "short": "Sedan 1889 — gjutjärnskonstruktion, fortfarande i drift.",
+      "narrative": "Stora Saluhallen öppnade 1889. Konstruktionen i gjutjärn och glas är typiskt sent 1800-tal — samma idé som Les Halles i Paris, samma idé som Covent Garden — och den här är en av få i Sverige som faktiskt har överlevt med samma funktion i hundratrettiofem år. Det är fortfarande fisk, kött, ost, bröd, och småluncher som domineras av gamla göteborgare. Gå in en sväng. Det är inte gratis-marknadshallen för turister — det är fortfarande där folk handlar middag på torsdag eftermiddag. Räkmackorna är överprisade men ärligt nog så.",
+      "images": [
+        { "source": "wikipedia", "article": "Stora_Saluhallen", "lang": "sv" }
+      ],
+      "walk_to_next": {
+        "distance_m": 450,
+        "estimated_minutes": 6,
+        "directions_hint": "Vidare söderut, följ Rosenlundskanalen västerut — Feskekörka dyker upp på din vänstra sida som en konstig medeltidskyrka."
+      }
+    },
+    {
+      "id": "wp-04",
+      "order": 4,
+      "title": "Feskekörka",
+      "coordinates": [57.7011, 11.9622],
+      "trigger_radius_m": 25,
+      "short": "Fiskhall i kyrkstil — sedan 1874, alltid kallad körkan.",
+      "narrative": "Den ser ut som en kyrka, vilket är hela poängen. När den öppnade 1874 hånlogde göteborgarna åt att de byggt en fiskhall i nygotisk stil och döpte den genast till Feskekörka — fisk-kyrkan. Namnet fastnade så pass att stadsförvaltningen gav upp och accepterade det. Arkitekten Victor von Gegerfelt ritade den inspirerad av norska stavkyrkor och engelska gotiska kapell, vilket är en udda kombination för en byggnad där det luktar fisk. Den var stängd 2020–2024 för renovering och öppnade igen som matmarknad. Står hon öppen, gå in. Lukten är inte vad den var, vilket beror på modernare köldhantering och inte på saknad av fisk.",
+      "images": [
+        { "source": "wikipedia", "article": "Feskek%C3%B6rka", "lang": "sv" }
+      ],
+      "links": [
+        { "label": "Wikipedia", "url": "https://sv.wikipedia.org/wiki/Feskek%C3%B6rka" }
+      ],
+      "trivia": [
+        "Inga riktiga gudstjänster har någonsin hållits här.",
+        "Renoveringen 2020–2024 avslöjade att flera bjälkar var ursprungliga från 1874."
+      ],
+      "walk_to_next": {
+        "distance_m": 550,
+        "estimated_minutes": 8,
+        "directions_hint": "Korsa Rosenlundskanalen söderut, fortsätt mot Haga — du ser de låga trähusen så fort du kommit över."
+      }
+    },
+    {
+      "id": "wp-05",
+      "order": 5,
+      "title": "Haga Nygata",
+      "coordinates": [57.6998, 11.9577],
+      "trigger_radius_m": 40,
+      "short": "Göteborgs första förort — och dess första räddade kvarter.",
+      "narrative": "Haga var Göteborgs första förort, anlagd 1648 utanför stadsmurarna för arbetare som inte fick bo innanför. På 1800-talet bodde här fabriksarbetare, sjömän, fattigt folk — på 1960-talet var det en av Sveriges mest nedslitna stadsdelar och planerades att rivas helt och byggas om till skivhus. Mellan 1976 och 1985 stoppades rivningen efter aktivism, och kvar finns de här låga trä- och landshövdingehusen — typiska Göteborg, två våningar trä på en våning sten, ett kompromissbygge för att kringgå brandregler på sent 1800-tal. Idag är det fullt av kaféer och butiker; den hagabo som bodde här 1955 skulle inte känna igen sig, men huset står kvar. Det är en seger som kommer av civil olydnad. Sätt dig och ta en bulle — de är stora i Haga, det är en hel grej. Vi slutar här.",
+      "images": [
+        { "source": "wikipedia", "article": "Haga,_G%C3%B6teborg", "lang": "sv" },
+        { "source": "search_query", "query": "Haga Nygata landshövdingehus Göteborg" }
+      ],
+      "links": [
+        { "label": "Wikipedia om Haga", "url": "https://sv.wikipedia.org/wiki/Haga,_G%C3%B6teborg" }
+      ],
+      "accessibility_notes": "Kullersten på gångbanorna."
+    }
+  ]
+}
