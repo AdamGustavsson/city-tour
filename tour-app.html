@@ -778,12 +778,40 @@ function setTTSButton(state) {
   btn.dataset.state = state;
 }
 
+/* On iOS (especially as a home-screen PWA), HTMLAudioElement.play()
+ * must be called from a user gesture. After an `await fetch(...)` the
+ * gesture is gone, so we keep ONE Audio element across the session
+ * and "prime" it synchronously inside the click handler before any
+ * async work — that locks in the gesture permission. Later we just
+ * swap its `src` to the blob URL. */
+function ensureAudioElement() {
+  if (App.ttsAudioEl) return App.ttsAudioEl;
+  const a = new Audio();
+  a.preload = 'auto';
+  a.addEventListener('ended', () => setTTSButton('idle'));
+  a.addEventListener('play', () => setTTSButton('playing'));
+  a.addEventListener('pause', () => {
+    if (!a.ended && a.currentTime > 0) setTTSButton('paused');
+  });
+  App.ttsAudioEl = a;
+  return a;
+}
+
+function primeAudioGesture() {
+  // Call inside the click handler, synchronously, before any await.
+  const a = ensureAudioElement();
+  // .load() is the cheapest no-op that consumes the gesture.
+  try { a.load(); } catch {}
+}
+
 function stopTTS() {
   if (App.ttsAbort) { try { App.ttsAbort.abort(); } catch {} App.ttsAbort = null; }
-  if (App.ttsAudio) {
-    App.ttsAudio.pause();
-    App.ttsAudio.src = '';
-    App.ttsAudio = null;
+  if (App.ttsAudioEl) {
+    try { App.ttsAudioEl.pause(); } catch {}
+    if (App.ttsAudioEl.src && App.ttsAudioEl.src.startsWith('blob:')) {
+      URL.revokeObjectURL(App.ttsAudioEl.src);
+    }
+    App.ttsAudioEl.removeAttribute('src');
   }
   if (window.speechSynthesis) window.speechSynthesis.cancel();
   App.ttsPlaying = false;
@@ -795,15 +823,17 @@ function onTTSClick(text, lang) {
   const state = btn?.dataset.state || 'idle';
   if (state === 'loading') return;
   if (state === 'playing') {
-    if (App.ttsAudio) { App.ttsAudio.pause(); setTTSButton('paused'); }
+    if (App.ttsAudioEl && !App.ttsAudioEl.paused) { App.ttsAudioEl.pause(); setTTSButton('paused'); }
     else if (window.speechSynthesis?.speaking) { speechSynthesis.pause(); setTTSButton('paused'); }
     return;
   }
   if (state === 'paused') {
-    if (App.ttsAudio) { App.ttsAudio.play(); setTTSButton('playing'); }
+    if (App.ttsAudioEl && App.ttsAudioEl.src) { App.ttsAudioEl.play().catch(()=>{}); setTTSButton('playing'); }
     else if (window.speechSynthesis?.paused) { speechSynthesis.resume(); setTTSButton('playing'); }
     return;
   }
+  // CRITICAL: prime audio synchronously inside the user gesture.
+  primeAudioGesture();
   playTTS(text, lang);
 }
 
@@ -866,15 +896,16 @@ async function playTTS(text, lang) {
       setTTSButton('idle');
       return;
     }
-    const audio = new Audio(URL.createObjectURL(blob));
-    audio.addEventListener('ended', () => { if (App.ttsAudio === audio) setTTSButton('idle'); });
-    audio.addEventListener('pause', () => {
-      if (App.ttsAudio === audio && !audio.ended && audio.currentTime > 0) setTTSButton('paused');
-    });
-    audio.addEventListener('play', () => { if (App.ttsAudio === audio) setTTSButton('playing'); });
-    App.ttsAudio = audio;
+    const audio = ensureAudioElement();
+    if (audio.src && audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src);
+    audio.src = URL.createObjectURL(blob);
     App.ttsPlaying = true;
-    await audio.play();
+    try {
+      await audio.play();
+    } catch (playErr) {
+      snackbar(`Uppspelning blockerad: ${playErr.message || playErr}. Tryck Läs upp igen.`);
+      setTTSButton('idle');
+    }
   } catch (e) {
     if (ac.signal.reason === 'timeout') {
       snackbar(`${provider} TTS svarade inte på 45 s — försök igen`);
