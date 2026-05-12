@@ -38,8 +38,7 @@
       ],
       "walk_to_next": {
         "distance_m": 340,
-        "estimated_minutes": 5,
-        "directions_hint": "Söderut längs Via del Moro, in i kvarterets nät av smågator."
+        "estimated_minutes": 5
       }
     },
     {
@@ -68,8 +67,7 @@
       ],
       "walk_to_next": {
         "distance_m": 420,
-        "estimated_minutes": 6,
-        "directions_hint": "Sydväst, in på Via della Lungaretta — mot Viale Trastevere."
+        "estimated_minutes": 6
       }
     },
     {
@@ -93,8 +91,7 @@
       "accessibility_notes": "Branta trappor ner till scavi.",
       "walk_to_next": {
         "distance_m": 520,
-        "estimated_minutes": 7,
-        "directions_hint": "Korsa Viale Trastevere — passa upp för spårvagnar — och vidare in i det östra Trastevere."
+        "estimated_minutes": 7
       }
     },
     {
@@ -116,8 +113,7 @@
       ],
       "walk_to_next": {
         "distance_m": 690,
-        "estimated_minutes": 9,
-        "directions_hint": "Norrut, in i de smala gränderna mot Santa Cecilia."
+        "estimated_minutes": 9
       }
     },
     {
@@ -144,8 +140,7 @@
       ],
       "walk_to_next": {
         "distance_m": 450,
-        "estimated_minutes": 6,
-        "directions_hint": "Norrut längs Tibern — du kommer ut mot Isola Tiberina."
+        "estimated_minutes": 6
       }
     },
     {
@@ -168,8 +163,7 @@
       ],
       "walk_to_next": {
         "distance_m": 1420,
-        "estimated_minutes": 19,
-        "directions_hint": "Tillbaka över Ponte Cestio, västerut in i kvarteret igen, mot Janiculum-kullen."
+        "estimated_minutes": 19
       }
     },
     {
@@ -193,8 +187,7 @@
       "accessibility_notes": "Klättring uppför kullen — branta trappor.",
       "walk_to_next": {
         "distance_m": 530,
-        "estimated_minutes": 7,
-        "directions_hint": "Söder längs Passeggiata del Gianicolo — vyn till vänster är hela poängen."
+        "estimated_minutes": 7
       }
     },
     {

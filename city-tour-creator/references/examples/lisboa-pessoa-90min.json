@@ -45,8 +45,7 @@
       ],
       "walk_to_next": {
         "distance_m": 90,
-        "estimated_minutes": 1,
-        "directions_hint": "Gå nedför Rua Garrett, ner mot Largo do Chiado — bokhandeln ligger till vänster strax efter att gatan svänger."
+        "estimated_minutes": 1
       }
     },
     {
@@ -75,8 +74,7 @@
       ],
       "walk_to_next": {
         "distance_m": 640,
-        "estimated_minutes": 9,
-        "directions_hint": "Vidare nedåt mot Praça do Comércio — du ser triumfbågen och floden längst ner."
+        "estimated_minutes": 9
       }
     },
     {
@@ -99,8 +97,7 @@
       ],
       "walk_to_next": {
         "distance_m": 710,
-        "estimated_minutes": 9,
-        "directions_hint": "Ta hissen i Elevador de Santa Justa upp, eller gå Calçada do Carmo — det är trappor men kortare."
+        "estimated_minutes": 9
       }
     },
     {
@@ -130,8 +127,7 @@
       "accessibility_notes": "Trappor upp. Branta gator runt om.",
       "walk_to_next": {
         "distance_m": 1060,
-        "estimated_minutes": 14,
-        "directions_hint": "Norrut längs Rua da Misericórdia mot Príncipe Real."
+        "estimated_minutes": 14
       }
     },
     {
@@ -158,8 +154,7 @@
       ],
       "walk_to_next": {
         "distance_m": 1570,
-        "estimated_minutes": 21,
-        "directions_hint": "Västerut mot Campo de Ourique, korsa Rua da Escola Politécnica."
+        "estimated_minutes": 21
       }
     },
     {
@@ -196,8 +191,7 @@
       ],
       "walk_to_next": {
         "distance_m": 1060,
-        "estimated_minutes": 14,
-        "directions_hint": "Söderut mot Cemitério dos Prazeres — du följer Rua Coelho da Rocha tills den slutar vid muren."
+        "estimated_minutes": 14
       }
     },
     {
@@ -221,8 +215,7 @@
       "accessibility_notes": "Grusgångar.",
       "walk_to_next": {
         "distance_m": 1340,
-        "estimated_minutes": 18,
-        "directions_hint": "Tillbaka mot Estrela, in i parken."
+        "estimated_minutes": 18
       }
     },
     {

@@ -105,8 +105,7 @@
             "type": "object",
             "properties": {
               "distance_m": { "type": "integer", "minimum": 0 },
-              "estimated_minutes": { "type": "integer", "minimum": 0 },
-              "directions_hint": { "type": "string" }
+              "estimated_minutes": { "type": "integer", "minimum": 0 }
             }
           },
           "accessibility_notes": { "type": "string" },

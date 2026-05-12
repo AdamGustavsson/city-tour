@@ -37,8 +37,7 @@
       ],
       "walk_to_next": {
         "distance_m": 350,
-        "estimated_minutes": 5,
-        "directions_hint": "Västerut längs Kungsgatan, sedan höger in på Västra Hamngatan — du ser domkyrkans torn över taken."
+        "estimated_minutes": 5
       }
     },
     {
@@ -67,8 +66,7 @@
       ],
       "walk_to_next": {
         "distance_m": 230,
-        "estimated_minutes": 3,
-        "directions_hint": "Söderut längs Västra Hamngatan, över Vallgraven via Rosenlundsbron — du ser saluhallen på vänster sida när du kommit över."
+        "estimated_minutes": 3
       }
     },
     {
@@ -91,8 +89,7 @@
       ],
       "walk_to_next": {
         "distance_m": 830,
-        "estimated_minutes": 11,
-        "directions_hint": "Vidare söderut, följ Rosenlundskanalen västerut — Feskekörka dyker upp på din vänstra sida som en konstig medeltidskyrka."
+        "estimated_minutes": 11
       }
     },
     {
@@ -125,8 +122,7 @@
       ],
       "walk_to_next": {
         "distance_m": 370,
-        "estimated_minutes": 5,
-        "directions_hint": "Korsa Rosenlundskanalen söderut, fortsätt mot Haga — du ser de låga trähusen så fort du kommit över."
+        "estimated_minutes": 5
       }
     },
     {

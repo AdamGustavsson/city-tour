@@ -44,8 +44,7 @@
       ],
       "walk_to_next": {
         "distance_m": 110,
-        "estimated_minutes": 1,
-        "directions_hint": "Norrut förbi Börsen, ut mot Slottsbacken — du ser slottet öppna sig till höger."
+        "estimated_minutes": 1
       }
     },
     {
@@ -68,8 +67,7 @@
       ],
       "walk_to_next": {
         "distance_m": 170,
-        "estimated_minutes": 2,
-        "directions_hint": "Gå tillbaka söderut, in på Köpmangatan — en av öns äldsta gator."
+        "estimated_minutes": 2
       }
     },
     {
@@ -91,8 +89,7 @@
       ],
       "walk_to_next": {
         "distance_m": 310,
-        "estimated_minutes": 4,
-        "directions_hint": "Söderut, in i den smala Mårten Trotzigs gränd."
+        "estimated_minutes": 4
       }
     },
     {
@@ -116,8 +113,7 @@
       "accessibility_notes": "Trappor, mycket smalt. Inte rullstolsvänligt.",
       "walk_to_next": {
         "distance_m": 630,
-        "estimated_minutes": 8,
-        "directions_hint": "Västerut mot Riddarholmen — du går över en kort bro."
+        "estimated_minutes": 8
       }
     },
     {
@@ -140,8 +136,7 @@
       ],
       "walk_to_next": {
         "distance_m": 660,
-        "estimated_minutes": 9,
-        "directions_hint": "Tillbaka över bron, söderut mot Järntorget."
+        "estimated_minutes": 9
       }
     },
     {

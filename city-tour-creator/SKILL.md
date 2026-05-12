@@ -165,12 +165,9 @@ Avsluta med en kort sammanfattning till användaren:
 
 ## Tänk så här om mindre uppenbara saker
 
-### Övergångar (`walk_to_next.directions_hint`)
+### Vägbeskrivningar mellan stopp — gör inte det
 
-Inte turn-by-turn. Appen har en Google Maps-knapp för det. Skriv en *minnesregel* för riktning, gärna med en visuell ledtråd:
-
-- Svagt: *"Gå 320 m åt nordväst."*
-- Starkt: *"Följ Rua Garrett nedför mot floden — du ser Tejo glimta längst ner."*
+Försök **inte** skriva text-baserade vägbeskrivningar mellan waypoints. Du kan inte avgöra enkelriktningar, trappor, aktuella avstängningar eller vilken hörna som är vilken — och fel där förstör flödet i turen. Appen löser det åt användaren via Google Maps-knappen "Navigera till nästa". Fyll i `walk_to_next.distance_m` och `walk_to_next.estimated_minutes`, inget mer.
 
 ### Stängda eller borttagna platser
 
