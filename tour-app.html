@@ -948,13 +948,33 @@ function webSpeech(text, lang) {
 
 /* --- Maps deep-link --- */
 function openInMaps(coords) {
+  const [lat, lng] = coords;
+  const pref = Settings.get('maps_app', 'google');
   const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
-  const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${coords[0]},${coords[1]}&travelmode=walking`;
-  if (isApple && confirm('Öppna i Apple Maps? (Avbryt = Google Maps)')) {
-    window.location.href = `maps://maps.apple.com/?daddr=${coords[0]},${coords[1]}&dirflg=w`;
-  } else {
-    window.open(gmaps, '_blank');
+
+  if (pref === 'apple') {
+    window.location.href = `maps://maps.apple.com/?daddr=${lat},${lng}&dirflg=w`;
+    return;
   }
+  if (pref === 'osm') {
+    window.open(`https://www.openstreetmap.org/directions?from=&to=${lat}%2C${lng}&route=foot`, '_blank');
+    return;
+  }
+  // Google Maps. On iOS, comgooglemaps:// opens the app directly when
+  // installed; fall back to the universal https URL after a short delay
+  // if the scheme didn't take.
+  if (isApple) {
+    const fallback = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    const start = Date.now();
+    window.location.href = `comgooglemaps://?daddr=${lat},${lng}&directionsmode=walking`;
+    setTimeout(() => {
+      if (document.visibilityState === 'visible' && Date.now() - start < 1500) {
+        window.location.href = fallback;
+      }
+    }, 800);
+    return;
+  }
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`, '_blank');
 }
 
 /* --- Wake Lock --- */
@@ -1085,6 +1105,16 @@ function renderSettings() {
     snackbar('ElevenLabs-nyckel sparad');
   });
   root.appendChild(elInput);
+
+  root.appendChild(el('h2', {}, 'Navigering'));
+  const mapsSel = el('select', {},
+    el('option', { value: 'google' }, 'Google Maps (öppnar appen på iOS om installerad)'),
+    el('option', { value: 'apple' }, 'Apple Maps'),
+    el('option', { value: 'osm' }, 'OpenStreetMap'),
+  );
+  mapsSel.value = s.maps_app || 'google';
+  mapsSel.addEventListener('change', () => Settings.set('maps_app', mapsSel.value));
+  root.appendChild(el('label', {}, 'Karta-app')); root.appendChild(mapsSel);
 
   root.appendChild(el('h2', {}, 'Tur-beteende'));
   root.appendChild(el('label', {}, 'Trigger-radie multiplikator (1.0 = standard)'));
