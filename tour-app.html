@@ -258,8 +258,8 @@ function loadTour(id) {
   try { return JSON.parse(localStorage.getItem(`tour::${id}::data`)); } catch { return null; }
 }
 function loadProgress(id) {
-  try { return JSON.parse(localStorage.getItem(`tour::${id}::progress`)) || { visited: [], skipped: [], notes: {} }; }
-  catch { return { visited: [], skipped: [], notes: {} }; }
+  try { return JSON.parse(localStorage.getItem(`tour::${id}::progress`)) || { visited: [], skipped: [] }; }
+  catch { return { visited: [], skipped: [] }; }
 }
 function saveProgress(id, p) { localStorage.setItem(`tour::${id}::progress`, JSON.stringify(p)); }
 function deleteTour(id) {
@@ -672,8 +672,6 @@ async function showWaypointModal(idx, isArrival) {
   const imagesDiv = el('div', { class: 'wp-images' });
   const linksDiv = el('div', { class: 'links' });
 
-  const noteVal = (App.progress.notes && App.progress.notes[wp.id]) || '';
-
   const content = el('div', {},
     el('div', { class: 'modal-header' },
       el('div', {},
@@ -706,8 +704,6 @@ async function showWaypointModal(idx, isArrival) {
     el('div', { class: 'btn-row' },
       el('button', { class: 'btn secondary', onclick: () => openInMaps(wp.coordinates) }, `🗺 Hitta hit (${wp.title})`)
     ),
-    el('label', {}, 'Anteckning'),
-    el('textarea', { oninput: e => { App.progress.notes = App.progress.notes || {}; App.progress.notes[wp.id] = e.target.value; saveProgress(App.tour.tour.id, App.progress); } }, noteVal),
     App.active ? el('div', { class: 'btn-row' },
       el('button', { class: 'btn', onclick: () => { markVisited(idx); advance(); } }, visited ? 'Nästa stopp' : 'Klar — gå vidare')
     ) : null
@@ -1002,37 +998,10 @@ function renderSummary() {
     el('div', {}, `Hoppade över: ${(App.progress.skipped || []).length}`),
     el('div', {}, `Tid: ${elapsed} min`)
   ));
-  const notes = App.progress.notes || {};
-  const hasNotes = Object.values(notes).some(v => v && v.trim());
-  if (hasNotes) {
-    root.appendChild(el('h2', {}, 'Anteckningar'));
-    App.tour.waypoints.forEach(w => {
-      if (notes[w.id]) {
-        root.appendChild(el('div', { class: 'card' },
-          el('strong', {}, w.title),
-          el('div', { class: 'narrative' }, notes[w.id])
-        ));
-      }
-    });
-  }
   root.appendChild(el('div', { class: 'btn-row' },
-    el('button', { class: 'btn secondary', onclick: () => exportMarkdown() }, 'Exportera markdown'),
-    el('button', { class: 'btn secondary', onclick: () => { App.progress = { visited: [], skipped: [], notes: {} }; saveProgress(App.tour.tour.id, App.progress); App.startedAt = null; App.view = 'overview'; render(); } }, 'Starta om'),
+    el('button', { class: 'btn secondary', onclick: () => { App.progress = { visited: [], skipped: [] }; saveProgress(App.tour.tour.id, App.progress); App.startedAt = null; App.view = 'overview'; render(); } }, 'Starta om'),
     el('button', { class: 'btn ghost', onclick: () => goHome() }, 'Tillbaka')
   ));
-}
-
-function exportMarkdown() {
-  const t = App.tour.tour;
-  const notes = App.progress.notes || {};
-  let md = `# ${t.title}\n\n${t.city} · ${new Date().toLocaleDateString()}\n\n`;
-  App.tour.waypoints.forEach(w => {
-    md += `## ${w.order}. ${w.title}\n\n${w.short}\n\n`;
-    if (notes[w.id]) md += `> ${notes[w.id]}\n\n`;
-  });
-  const blob = new Blob([md], { type: 'text/markdown' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = `${t.id}-notes.md`; a.click();
 }
 
 /* --- Settings --- */
