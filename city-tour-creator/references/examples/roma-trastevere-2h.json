@@ -10,7 +10,10 @@
     "duration_minutes": 120,
     "distance_km": 4.4,
     "difficulty": "moderate",
-    "start_coordinates": [41.8896, 12.4695],
+    "start_coordinates": [
+      41.8918,
+      12.47
+    ],
     "intro_narrative": "Trastevere — bokstavligen 'bortom Tibern' — har alltid varit Roms andra sida. Hit kom hantverkarna, judarna, syrierna, sjömännen. Hit kom de som inte fick plats på den fina sidan av floden. Idag är det fortfarande den minst polerade delen av centrum, även om turismen jobbar på saken. Vi går två timmar genom åtta stopp. Kullerstenar hela vägen. Bekväma skor.",
     "outro_narrative": "Det här var Rom underifrån. Inte kejsarnas Rom, inte påvarnas, inte ens stjärnkockarnas. Romarnas Rom, mer eller mindre. Tack för promenaden — en bar väntar nästan oavsett vart du tittar härifrån."
   },
@@ -19,15 +22,22 @@
       "id": "wp-01",
       "order": 1,
       "title": "Piazza Trilussa",
-      "coordinates": [41.8896, 12.4695],
+      "coordinates": [
+        41.8918,
+        12.47
+      ],
       "trigger_radius_m": 50,
       "short": "Trappans torg — startpunkt och kvällsplats för hela kvarteret.",
       "narrative": "Vi börjar vid trappan. Det här är Trasteveres entré från andra sidan, Ponte Sisto-bron tar dig hit. Trilussa själv — riktiga namnet Carlo Alberto Salustri, 1871–1950 — var en romersk dialektpoet, en sorts Bellman som skrev på Trastevere-dialekt om vanliga människor. Statyn av honom står där, lite tafatt. På kvällarna är det här fullt av tonåringar med ölflaskor; det är något som inte har förändrats sedan 1920. Stå med ryggen mot floden. Allt framåt är vårt område nu.",
       "images": [
-        { "source": "wikipedia", "article": "Piazza_Trilussa", "lang": "it" }
+        {
+          "source": "wikipedia",
+          "article": "Piazza_Trilussa",
+          "lang": "it"
+        }
       ],
       "walk_to_next": {
-        "distance_m": 350,
+        "distance_m": 340,
         "estimated_minutes": 5,
         "directions_hint": "Söderut längs Via del Moro, in i kvarterets nät av smågator."
       }
@@ -36,15 +46,25 @@
       "id": "wp-02",
       "order": 2,
       "title": "Santa Maria in Trastevere",
-      "coordinates": [41.8893, 12.4699],
+      "coordinates": [
+        41.8894,
+        12.4695
+      ],
       "trigger_radius_m": 40,
       "short": "Roms äldsta Mariakyrka — guldmosaikerna inifrån är värda hela resan.",
       "narrative": "Förmodligen Roms äldsta kyrka tillägnad jungfru Maria — grundad på 200-talet, ombyggd på 1100-talet, och absolut ingenting har egentligen rörts sedan dess. Gå in. Mosaikerna i absiden är från 1140-talet och består av faktiskt guld i bakgrunden — när solen kommer in genom västfönstren glöder hela östra änden. På torget utanför finns en fontän som har funnits i någon form sedan 700-talet, vilket gör den till en av Europas äldsta i drift. Romare sitter på trappstegen runt fontänen. De har gjort det i tretton hundra år.",
       "images": [
-        { "source": "wikipedia", "article": "Santa_Maria_in_Trastevere", "lang": "en" }
+        {
+          "source": "wikipedia",
+          "article": "Santa_Maria_in_Trastevere",
+          "lang": "en"
+        }
       ],
       "links": [
-        { "label": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Santa_Maria_in_Trastevere" }
+        {
+          "label": "Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Santa_Maria_in_Trastevere"
+        }
       ],
       "walk_to_next": {
         "distance_m": 420,
@@ -56,16 +76,23 @@
       "id": "wp-03",
       "order": 3,
       "title": "San Crisogono",
-      "coordinates": [41.8881, 12.4711],
+      "coordinates": [
+        41.8891,
+        12.4735
+      ],
       "trigger_radius_m": 30,
       "short": "Två kyrkor staplade på varandra — den äldre under golvet.",
       "narrative": "Kyrkan ovan jord är från 1100-talet. Men gå ner. Under golvet — för några euro till sakristanen — finns resterna av en 300-tals-kyrka, en av de allra tidigaste i Rom. Du kommer ner i tunnlar med freskfragment som är 1700 år gamla, daggiga och nästan svindlande. Den ovanjordska kyrkan är fin, men det är källaren som är poängen. Frågar du efter scavi — utgrävningarna — så förstår de.",
       "images": [
-        { "source": "wikipedia", "article": "San_Crisogono", "lang": "en" }
+        {
+          "source": "wikipedia",
+          "article": "San_Crisogono",
+          "lang": "en"
+        }
       ],
       "accessibility_notes": "Branta trappor ner till scavi.",
       "walk_to_next": {
-        "distance_m": 500,
+        "distance_m": 520,
         "estimated_minutes": 7,
         "directions_hint": "Korsa Viale Trastevere — passa upp för spårvagnar — och vidare in i det östra Trastevere."
       }
@@ -74,15 +101,21 @@
       "id": "wp-04",
       "order": 4,
       "title": "Piazza di San Cosimato — marknaden",
-      "coordinates": [41.8868, 12.4699],
+      "coordinates": [
+        41.8871,
+        12.4693
+      ],
       "trigger_radius_m": 50,
       "short": "Trasteveres dagliga marknad — bondemarknad sedan 1922.",
       "narrative": "Mercato di San Cosimato har funnits i sin nuvarande form sedan 1922, men torget var marknadsplats redan på 1500-talet. På förmiddagar är det dussintals stånd här — kronärtskockor, kantareller, tre olika sorters basilika, fisk om du har tur. Eftermiddag är torget tomt och tonåringar spelar fotboll mellan pelarna. Det är en av få platser i Trastevere som fortfarande tjänar romarna mer än turisterna. Köp en persika. Den är från idag.",
       "images": [
-        { "source": "search_query", "query": "Mercato San Cosimato Trastevere" }
+        {
+          "source": "search_query",
+          "query": "Mercato San Cosimato Trastevere"
+        }
       ],
       "walk_to_next": {
-        "distance_m": 620,
+        "distance_m": 690,
         "estimated_minutes": 9,
         "directions_hint": "Norrut, in i de smala gränderna mot Santa Cecilia."
       }
@@ -91,20 +124,27 @@
       "id": "wp-05",
       "order": 5,
       "title": "Santa Cecilia in Trastevere",
-      "coordinates": [41.8879, 12.4767],
+      "coordinates": [
+        41.8876,
+        12.4759
+      ],
       "trigger_radius_m": 30,
       "short": "Cecilias kyrka — och den underligt sovande statyn över hennes huvud.",
       "narrative": "Här ska Cecilia ha bott. Hon var en romersk patricierdotter på 200-talet som vägrade tillbe romerska gudar; de försökte koka henne i hennes eget bad, det fungerade inte, så de halshögg henne, det fungerade också illa — hon överlevde tre slag och dog långsamt under tre dagar. När hennes grav öppnades 1599 var hennes kropp underligt bevarad, och konstnären Stefano Maderno fick syn på henne i några timmar innan de återbegravde henne. Hans staty — den ligger där, framför altaret — är en kopia av exakt vad han såg. Hon ligger på sidan, ansiktet bortvänt, en arm under huvudet. Det är en av få skulpturer i Rom som tar andan ur folk på riktigt.",
       "images": [
-        { "source": "wikipedia", "article": "Santa_Cecilia_in_Trastevere", "lang": "en" }
+        {
+          "source": "wikipedia",
+          "article": "Santa_Cecilia_in_Trastevere",
+          "lang": "en"
+        }
       ],
       "trivia": [
         "Maderno gjorde statyn 1600 — alltså omedelbart efter att graven öppnats.",
         "Cecilia är musikens skyddshelgon, fastän kopplingen är svag i de äldsta källorna."
       ],
       "walk_to_next": {
-        "distance_m": 700,
-        "estimated_minutes": 10,
+        "distance_m": 450,
+        "estimated_minutes": 6,
         "directions_hint": "Norrut längs Tibern — du kommer ut mot Isola Tiberina."
       }
     },
@@ -112,16 +152,23 @@
       "id": "wp-06",
       "order": 6,
       "title": "Isola Tiberina",
-      "coordinates": [41.8909, 12.4781],
+      "coordinates": [
+        41.8905,
+        12.4778
+      ],
       "trigger_radius_m": 50,
       "short": "Tiberns enda ö — Roms äldsta sjukhus sedan 1500-talet.",
       "narrative": "Stadens enda ö i Tibern. Form som ett skepp, vilket är medvetet — i antik tid byggde man stenmurar runt ön så att den skulle likna ett skepp som fört Asclepius hit. Han var medicinens gud, och en ormstav skulle ha krupit i land just här år 293 f.Kr. för att stoppa en pest. Ön har varit medicinsk i tvåtusen trehundra år sedan dess. Sjukhuset Fatebenefratelli ligger fortfarande där, fortfarande i drift, en av Europas äldsta i kontinuerlig verksamhet. Stå på bron och tänk på det. Det här lilla skeppet av sten har behandlat sjuka människor i hundra generationer.",
       "images": [
-        { "source": "wikipedia", "article": "Tiber_Island", "lang": "en" }
+        {
+          "source": "wikipedia",
+          "article": "Tiber_Island",
+          "lang": "en"
+        }
       ],
       "walk_to_next": {
-        "distance_m": 550,
-        "estimated_minutes": 8,
+        "distance_m": 1420,
+        "estimated_minutes": 19,
         "directions_hint": "Tillbaka över Ponte Cestio, västerut in i kvarteret igen, mot Janiculum-kullen."
       }
     },
@@ -129,16 +176,23 @@
       "id": "wp-07",
       "order": 7,
       "title": "Fontana dell'Acqua Paola",
-      "coordinates": [41.8907, 12.4655],
+      "coordinates": [
+        41.8888,
+        12.4643
+      ],
       "trigger_radius_m": 40,
       "short": "Den stora fontänen från Sorrentinos La Grande Bellezza.",
       "narrative": "Den enorma vita fontänen på Janiculum byggdes 1612 av påve Paulus V, mer för att synas än för att förse staden med vatten — men den gjorde båda. Marmoren stals från Konstantins forum, kolonnerna från Petersbasilikans gamla atrium. Det är hård återanvändning, även med 1600-talets mått. Du kanske känner igen vyn: Sorrentinos film La Grande Bellezza öppnar med en japansk turist som dör framför den här fontänen. Stå där han stod. Bakom dig: hela Rom från ovan.",
       "images": [
-        { "source": "wikipedia", "article": "Fontana_dell%27Acqua_Paola", "lang": "en" }
+        {
+          "source": "wikipedia",
+          "article": "Fontana_dell%27Acqua_Paola",
+          "lang": "en"
+        }
       ],
       "accessibility_notes": "Klättring uppför kullen — branta trappor.",
       "walk_to_next": {
-        "distance_m": 420,
+        "distance_m": 530,
         "estimated_minutes": 7,
         "directions_hint": "Söder längs Passeggiata del Gianicolo — vyn till vänster är hela poängen."
       }
@@ -147,12 +201,19 @@
       "id": "wp-08",
       "order": 8,
       "title": "Piazzale Garibaldi — utsikten",
-      "coordinates": [41.8924, 12.4621],
+      "coordinates": [
+        41.8914,
+        12.4605
+      ],
       "trigger_radius_m": 50,
       "short": "Roms bästa utsikt — gratis, alltid öppen, kanonsalut kl 12.",
       "narrative": "Vi avslutar med utsikten. Janiculum-kullen är inte en av Roms officiella sju kullar, men den är högre än alla. Härifrån ser du allt: Vittoriano, kupolerna, Aventinen, kullarna i fjärran. Statyn är Giuseppe Garibaldi som försvarade den nya republiken här 1849 — han förlorade, men det är en annan historia. Klockan tolv varje dag avfyras en kanon från en av de små piedestalerna nedanför; den har gjort det sedan 1847 så att stadens klockor ska kunna synkroniseras. Om du är här strax före tolv, vänta. Det är en obetalt fin liten ceremoni.",
       "images": [
-        { "source": "wikipedia", "article": "Janiculum", "lang": "en" }
+        {
+          "source": "wikipedia",
+          "article": "Janiculum",
+          "lang": "en"
+        }
       ]
     }
   ]
