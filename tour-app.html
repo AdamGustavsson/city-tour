@@ -324,6 +324,10 @@ function renderStart() {
   });
   root.appendChild(drop);
 
+  root.appendChild(el('div', { class: 'btn-row' },
+    el('button', { class: 'btn secondary', onclick: () => openPasteModal() }, '📋 Klistra in JSON')
+  ));
+
   const idx = loadIndex();
   if (idx.length) {
     root.appendChild(el('h2', {}, 'Sparade turer'));
@@ -349,6 +353,54 @@ function renderStart() {
     )
   );
   root.appendChild(help);
+}
+
+async function openPasteModal() {
+  const ta = el('textarea', {
+    placeholder: 'Klistra in hela tour-JSON här...',
+    style: 'min-height: 240px; font-family: ui-monospace, monospace; font-size: 0.85rem;'
+  });
+  // Try to pre-fill from clipboard if the browser allows it.
+  if (navigator.clipboard?.readText) {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && text.trim().startsWith('{')) ta.value = text;
+    } catch { /* permission denied or unsupported — silent */ }
+  }
+  const importBtn = el('button', { class: 'btn', onclick: () => handleJSONText(ta.value) }, 'Importera');
+  const pasteBtn = el('button', { class: 'btn secondary', onclick: async () => {
+    try {
+      ta.value = await navigator.clipboard.readText();
+    } catch {
+      snackbar('Kunde inte läsa urklipp — klistra in manuellt');
+    }
+  }}, '📋 Hämta från urklipp');
+  openModal(el('div', {},
+    el('div', { class: 'modal-header' },
+      el('h2', {}, 'Klistra in tour-JSON'),
+      el('button', { class: 'close', onclick: () => closeModal() }, '✕')
+    ),
+    el('div', { class: 'dim', style: 'margin-bottom: 8px;' },
+      'Kopiera hela JSON-blocket från din AI-konversation och klistra in nedan.'),
+    ta,
+    el('div', { class: 'btn-row', style: 'margin-top: 12px;' }, pasteBtn, importBtn)
+  ));
+  setTimeout(() => ta.focus(), 50);
+}
+
+function handleJSONText(text) {
+  text = (text || '').trim();
+  if (!text) return showErrors(['Tomt fält — klistra in JSON först.']);
+  // Tolerate accidental markdown code-fence wrapping.
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  let data;
+  try { data = JSON.parse(text); }
+  catch (e) { return showErrors(['JSON gick inte att tolka: ' + e.message]); }
+  const errs = validateTour(data);
+  if (errs.length) return showErrors(errs);
+  closeModal();
+  saveTour(data);
+  openTour(data.tour.id);
 }
 
 async function handleFile(file) {
