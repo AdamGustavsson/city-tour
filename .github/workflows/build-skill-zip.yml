@@ -1,0 +1,34 @@
+name: Rebuild skill zip
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'city-tour-creator/**'
+      - '.github/workflows/build-skill-zip.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build city-tour-creator.zip
+        run: |
+          rm -f city-tour-creator.zip
+          zip -r city-tour-creator.zip city-tour-creator -x "*.DS_Store"
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet city-tour-creator.zip; then
+            echo "zip unchanged"
+            exit 0
+          fi
+          git add city-tour-creator.zip
+          git commit -m "chore: rebuild city-tour-creator.zip"
+          git push

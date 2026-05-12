@@ -344,6 +344,9 @@ function renderStart() {
   const help = el('details', { class: 'help' },
     el('summary', {}, 'Hur skapar jag en tur?'),
     el('p', {}, 'Be din AI-assistent (Claude, ChatGPT m.fl.) skapa en tur. Installera skill-paketet city-tour-creator för bästa resultat, eller klistra in dess SKILL.md i samtalet. Be t.ex.: "Skapa en 90-minuters litterär stadstur i Lissabon, på svenska." Spara svaret som en .json-fil och släpp den här.'),
+    el('div', { class: 'btn-row', style: 'margin-top: 8px;' },
+      el('a', { class: 'btn secondary', href: 'city-tour-creator.zip', download: 'city-tour-creator.zip', style: 'text-decoration:none;' }, '⬇ Ladda ner skill-paket (.zip)')
+    )
   );
   root.appendChild(help);
 }
