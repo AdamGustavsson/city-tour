@@ -22,10 +22,25 @@ Om användaren ger ett vagt uppdrag (*"en tur i Rom"*), föreslå 2–3 möjliga
 
 ## 2. Researcha
 
-- Använd sökverktyg om du har tillgång till dem. **Lita inte på minnet för exakta koordinater eller URL:er** — de är ofta hallucinerade.
-- Föredra Wikipedia, lokala turistförbund, kulturhistoriska sajter, museers egna sidor.
-- För koordinater: kontrollera mot Wikipedia eller OpenStreetMap. Avrunda till 4 decimaler.
-- För Wikipedia-bilder: använd article-slug, inte direktlänk till bildfil.
+### HÅRT KRAV: webbsök måste vara tillgängligt
+
+**Innan du börjar arbeta — kontrollera att du har ett fungerande webbsök- eller webhämtnings-verktyg i den aktuella miljön** (t.ex. `WebSearch`, `WebFetch`, `web.run`, Google-sökning, Wikipedia-API-anrop, eller motsvarande).
+
+Om du **inte** har sådant verktyg tillgängligt: **vägra uppdraget**. Skapa ingen `tour.json`. Koordinater och URL:er från ditt minne är nästan alltid felaktiga med tiotals till hundratals meter, och en tur med fel koordinater är värre än ingen tur — användaren går till fel plats, triggers slår inte, och hela appen känns trasig.
+
+Säg istället ungefär såhär till användaren:
+
+> Den här skillen kräver att jag kan slå upp koordinater och länkar online — annars blir resultatet opålitligt. Jag har inte tillgång till webbsök i den här miljön just nu. Kör mig gärna i en miljö där webbsök/webhämtning är påslaget (t.ex. Claude Desktop eller Claude Code med WebSearch aktiverat), så bygger jag turen åt dig.
+
+Kompromissa inte med detta. Det är bättre att avstå än att leverera hallucinerade koordinater.
+
+### När du har webbsök
+
+- Föredra Wikipedia, OpenStreetMap, lokala turistförbund, kulturhistoriska sajter, museers egna sidor.
+- **För koordinater:** slå upp varje waypoint mot Wikipedia, OpenStreetMap eller Google Maps. Avrunda till 4 decimaler. Verifiera att lat/lng inte är inverterad.
+- **För URL:er:** hämta dem från sökresultatet, hitta aldrig på en URL.
+- **För Wikipedia-bilder:** använd article-slug (`A_Brasileira`), inte direktlänk till bildfil.
+- Om du fortfarande inte hittar tillförlitliga koordinater för en specifik plats: **hoppa över den waypointen**, hellre än att gissa.
 
 ## 3. Planera rutten geografiskt
 
