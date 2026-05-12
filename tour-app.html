@@ -671,7 +671,7 @@ async function showWaypointModal(idx, isArrival) {
     ) : null,
     linksDiv,
     el('div', { class: 'btn-row' },
-      el('button', { class: 'btn secondary', onclick: () => playTTS(wp.narrative, t.language) }, '🔊 Läs upp'),
+      el('button', { class: 'btn secondary', id: 'tts-btn', onclick: () => onTTSClick(wp.narrative, t.language) }, '🔊 Läs upp'),
       el('button', { class: 'btn secondary', onclick: () => openInMaps(wp.coordinates) }, 'Maps')
     ),
     el('label', {}, 'Anteckning'),
@@ -685,9 +685,12 @@ async function showWaypointModal(idx, isArrival) {
   loadWaypointImages(wp, t, imagesDiv);
   renderLinks(wp.links || [], linksDiv);
 
-  // Auto-play TTS on arrival if enabled
+  // Auto-play TTS on arrival if enabled. Use a short delay so the
+  // modal animates in and the button is in the DOM before we set state.
   if (isArrival && Settings.get('autoplay', true)) {
     setTimeout(() => playTTS(wp.narrative, t.language), 400);
+  } else {
+    setTTSButton('idle');
   }
 }
 
@@ -731,58 +734,129 @@ function renderLinks(links, container) {
   }
 }
 
-/* --- TTS --- */
+/* --- TTS ---
+ * Button has four states:
+ *   idle    "🔊 Läs upp"
+ *   loading "⏳ Hämtar röst..."   (disabled, only for remote TTS)
+ *   playing "⏸ Pausa"
+ *   paused  "▶ Spela"
+ *
+ * Repeated clicks while loading are ignored. Starting a new TTS aborts
+ * any in-flight fetch (AbortController) so a slow earlier response can
+ * never override a newer one.
+ */
+function setTTSButton(state) {
+  const btn = document.getElementById('tts-btn');
+  if (!btn) return;
+  const labels = {
+    idle:    '🔊 Läs upp',
+    loading: '⏳ Hämtar röst...',
+    playing: '⏸ Pausa',
+    paused:  '▶ Spela',
+  };
+  btn.textContent = labels[state] || labels.idle;
+  btn.disabled = state === 'loading';
+  btn.dataset.state = state;
+}
+
 function stopTTS() {
-  if (App.ttsAudio) { App.ttsAudio.pause(); App.ttsAudio = null; }
+  if (App.ttsAbort) { try { App.ttsAbort.abort(); } catch {} App.ttsAbort = null; }
+  if (App.ttsAudio) {
+    App.ttsAudio.pause();
+    App.ttsAudio.src = '';
+    App.ttsAudio = null;
+  }
   if (window.speechSynthesis) window.speechSynthesis.cancel();
   App.ttsPlaying = false;
+  setTTSButton('idle');
+}
+
+function onTTSClick(text, lang) {
+  const btn = document.getElementById('tts-btn');
+  const state = btn?.dataset.state || 'idle';
+  if (state === 'loading') return;
+  if (state === 'playing') {
+    if (App.ttsAudio) { App.ttsAudio.pause(); setTTSButton('paused'); }
+    else if (window.speechSynthesis?.speaking) { speechSynthesis.pause(); setTTSButton('paused'); }
+    return;
+  }
+  if (state === 'paused') {
+    if (App.ttsAudio) { App.ttsAudio.play(); setTTSButton('playing'); }
+    else if (window.speechSynthesis?.paused) { speechSynthesis.resume(); setTTSButton('playing'); }
+    return;
+  }
+  playTTS(text, lang);
 }
 
 async function playTTS(text, lang) {
   stopTTS();
   const provider = Settings.get('tts_provider', 'web');
-  if (provider === 'openai') {
-    const key = localStorage.getItem('byok::openai');
-    if (!key) { snackbar('Ingen OpenAI-nyckel — använder Web Speech'); return webSpeech(text, lang); }
-    try {
+
+  if (provider === 'web') return webSpeech(text, lang);
+
+  const key = localStorage.getItem(`byok::${provider}`);
+  if (!key) {
+    snackbar(`Ingen ${provider}-nyckel — använder Web Speech`);
+    return webSpeech(text, lang);
+  }
+
+  setTTSButton('loading');
+  const ac = new AbortController();
+  App.ttsAbort = ac;
+
+  try {
+    let res;
+    if (provider === 'openai') {
       const voice = Settings.get('openai_voice', 'alloy');
-      const res = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
+      res = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST', signal: ac.signal,
         headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'tts-1', voice, input: text })
       });
-      if (!res.ok) { snackbar('OpenAI TTS misslyckades — kontrollera nyckel'); return webSpeech(text, lang); }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      App.ttsAudio = new Audio(url);
-      App.ttsAudio.play(); App.ttsPlaying = true;
-    } catch {
-      webSpeech(text, lang);
-    }
-  } else if (provider === 'elevenlabs') {
-    const key = localStorage.getItem('byok::elevenlabs');
-    const voiceId = Settings.get('elevenlabs_voice', '21m00Tcm4TlvDq8ikWAM');
-    if (!key) { snackbar('Ingen ElevenLabs-nyckel — använder Web Speech'); return webSpeech(text, lang); }
-    try {
-      const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
-        method: 'POST',
+    } else if (provider === 'elevenlabs') {
+      const voiceId = Settings.get('elevenlabs_voice', '21m00Tcm4TlvDq8ikWAM');
+      res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+        method: 'POST', signal: ac.signal,
         headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2' })
       });
-      if (!res.ok) { snackbar('ElevenLabs TTS misslyckades'); return webSpeech(text, lang); }
-      const blob = await res.blob();
-      App.ttsAudio = new Audio(URL.createObjectURL(blob));
-      App.ttsAudio.play(); App.ttsPlaying = true;
-    } catch { webSpeech(text, lang); }
-  } else {
+    }
+    if (ac.signal.aborted) return;
+    if (!res.ok) {
+      snackbar(`${provider} TTS misslyckades — kontrollera nyckel`);
+      return webSpeech(text, lang);
+    }
+    const blob = await res.blob();
+    if (ac.signal.aborted) return;
+    const audio = new Audio(URL.createObjectURL(blob));
+    audio.addEventListener('ended', () => { if (App.ttsAudio === audio) setTTSButton('idle'); });
+    audio.addEventListener('pause', () => {
+      if (App.ttsAudio === audio && !audio.ended && audio.currentTime > 0) setTTSButton('paused');
+    });
+    audio.addEventListener('play', () => { if (App.ttsAudio === audio) setTTSButton('playing'); });
+    App.ttsAudio = audio;
+    App.ttsPlaying = true;
+    await audio.play();
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    snackbar(`${provider} TTS-fel — använder Web Speech`);
     webSpeech(text, lang);
+  } finally {
+    if (App.ttsAbort === ac) App.ttsAbort = null;
   }
 }
 
 function webSpeech(text, lang) {
-  if (!window.speechSynthesis) return snackbar('Uppläsning stöds inte');
+  if (!window.speechSynthesis) {
+    snackbar('Uppläsning stöds inte');
+    setTTSButton('idle');
+    return;
+  }
   const u = new SpeechSynthesisUtterance(text);
   if (lang) u.lang = lang.length === 2 ? lang + '-' + lang.toUpperCase() : lang;
+  u.onstart = () => setTTSButton('playing');
+  u.onend = () => setTTSButton('idle');
+  u.onerror = () => setTTSButton('idle');
   speechSynthesis.speak(u);
   App.ttsPlaying = true;
 }
